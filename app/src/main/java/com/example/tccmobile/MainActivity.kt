@@ -77,37 +77,29 @@ private val VermelhoErro = Color(0xFFB3261E)
 
 @Composable
 fun LoginScreen() {
-    var email by rememberSaveable {
-        mutableStateOf("")
-    }
 
-    var senha by rememberSaveable {
-        mutableStateOf("")
-    }
+    var email by rememberSaveable { mutableStateOf("") }
 
-    var senhaVisivel by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var senha by rememberSaveable { mutableStateOf("") }
 
-    var tentouEntrar by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var senhaVisivel by rememberSaveable { mutableStateOf(false) }
+
+    var tentouEntrar by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
 
     // VALIDAÇÕES DE CAMPO
 
-    val emailValido = email.isNotBlank() &&
-            android.util.Patterns.EMAIL_ADDRESS
-                .matcher(email.trim())
-                .matches()
+    val emailValido= validarEmail(email)
+    val senhaValida = validarSenha(senha)
 
-    val senhaValida = senha.length >= 15
+
     val formularioValido = emailValido && senhaValida
 
     val mostrarErroEmail = tentouEntrar && !emailValido
     val mostrarErroSenha = tentouEntrar && !senhaValida
+
 
     Column(
         modifier = Modifier
@@ -328,7 +320,7 @@ fun LoginScreen() {
                 supportingText = {
                     if (mostrarErroSenha) {
                         Text(
-                            text = "A senha deve possuir pelo menos 15 caracteres.",
+                            text = "A senha deve possuir pelo menos 8 caracteres.",
                             color = VermelhoErro
                         )
                     }
@@ -556,192 +548,52 @@ fun HeroArea() {
     }
 }
 
+    private fun validarEmail(email: String): Boolean {
+        val emailNormalizado = email.trim()
 
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Fundo)
-//            .systemBarsPadding()
-//            .verticalScroll(rememberScrollState())
-//    ) {
-//        //AREA SUPERIOR / HERO
-//
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(228.dp)
-//        ) {
-//            Image(
-//                painter = painterResource(
-//                    id = R.drawable.hero_area
-//                ),
-//                contentDescription = "Pessoa cozinhando",
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier.fillMaxSize()
-//            )
-//
-//            //CAMADA ESCURA SOBRE A IMAGEM
-//
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .background(Color.Black.copy(alpha = 0.38f))
-//            )
-//
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(horizontal = 24.dp),
-//                verticalArrangement = Arrangement.Center,
-//                horizontalAlignment = Alignment.Start
-//            ) {
-//                //LOGO
-//
-//                Row(
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Text(
-//                        text = "&",
-//                        color = Color(0xff71c9c5),
-//                        fontSize = 50.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        fontFamily = FontFamily.Serif
-//                    )
-//
-//                    Text(
-//                        text = "Panelas",
-//                        color = Color.White,
-//                        fontSize = 48.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        fontFamily = FontFamily.Serif
-//                    )
-//                }
-//
-//                Spacer(
-//                    modifier = Modifier.height(20.dp)
-//                )
-//
-//                //FRASE
-//
-//                Row {
-//                    Text(
-//                        text = "Conecte-se pela ",
-//                        color = Color.White,
-//                        fontSize = 30.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        fontFamily = FontFamily.Serif
-//                    )
-//
-//                    Text(
-//                        text = "cozinha.",
-//                        color = Amarelo,
-//                        fontSize = 30.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        fontFamily = FontFamily.Serif
-//                    )
-//                }
-//            }
-//        }
-//    }
-//
-//    //CONTEÚDO DO LOGIN
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(
-//                horizontal = 24.dp,
-//                vertical = 28.dp
-//            )
-//    ) {
-//        Text(
-//            text = "Bem-vindo de volta!",
-//            color = textoPrincipal,
-//            fontSize = 27.sp,
-//            fontWeight = FontWeight.Bold,
-//            fontFamily = FontFamily.Serif
-//        )
-//
-//        Spacer(
-//            modifier = Modifier.height(6.dp)
-//        )
-//
-//        Text(
-//            text = "Entre na sua conta para continuar",
-//            color = textoSecundario,
-//            fontSize = 17.sp
-//        )
-//
-//        Spacer(
-//            modifier = Modifier.height(32.dp)
-//        )
-//
-//        //EMAIL
-//
-//        Text(
-//            text = "E-mail",
-//            color = textoPrincipal,
-//            fontSize = 17.sp,
-//            fontWeight = FontWeight.SemiBold
-//        )
-//
-//        Spacer(
-//            modifier = Modifier.height(8.dp)
-//        )
-//
-//        OutlinedTextField(
-//            value = email,
-//            onValueChange = { email = it },
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Email
-//            ),
-//            placeholder = {
-//                Text(
-//                    text = "seu@email.com",
-//                    color = textoSecundario,
-//                    fontSize = 17.sp
-//                )
-//            },
-//            singleLine = true,
-//            shape = RoundedCornerShape(18.dp),
-//            colors = OutlinedTextFieldDefaults.colors(
-//                unfocusedBorderColor = borda,
-//                focusedBorderColor = verde,
-//                unfocusedContainerColor = fundo,
-//                focusedContainerColor = fundo,
-//                cursorColor = verde
-//            )
-//        )
-//
-//        Spacer(
-//            modifier = Modifier.height(26.dp)
-//        )
-//
-//        //SENHA
-//
-//        Text(
-//            text = "Senha",
-//            color = textoPrincipal,
-//            fontSize = 17.sp,
-//            fontWeight = FontWeight.SemiBold
-//        )
-//
-//        Spacer(
-//            modifier = Modifier.height(8.dp)
-//        )
-//
-//        OutlinedTextField(
-//            value = senha,
-//            onValueChange = { senha = it },
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Password
-//            ),
-//            visualTransformation = if (mostrarSenha) {
-//                VisualTransformation.None
-//            } else{
-//                PasswordVisualTransformation()
-//            },
-//            singleLine = true
-//        )
-//    }
-//
+        // Aceita somente letras minúsculas e números antes de @gmail.com
+        val padraoEmail = Regex(
+            "^[a-z]+[a-z0-9]*@gmail\\.com$"
+        )
+
+        if (!padraoEmail.matches(emailNormalizado)) {
+            return false
+        }
+
+        val nomeUsuario = emailNormalizado.substringBefore("@")
+
+        val quantidadeLetras = nomeUsuario.count { it in 'a'..'z' }
+
+        val quantidadeNumeros = nomeUsuario.count { it in '0'..'9' }
+
+        // Precisa ter pelo menos uma letra
+        if (quantidadeLetras == 0) {
+            return false
+        }
+
+        // Não permite somente uma letra seguida de números
+        if (quantidadeLetras == 1 && quantidadeNumeros > 0) {
+            return false
+        }
+
+        // Se houver números, exige pelo menos 4 letras
+        // OU uma combinação de letras e números com pelo menos 2 letras
+        if (quantidadeNumeros > 0 && quantidadeLetras < 2) {
+            return false
+        }
+
+        return true
+    }
+
+private fun validarSenha(senha: String): Boolean {
+    val temMaiuscula = senha.any { it.isUpperCase() }
+    val temNumero = senha.any { it.isDigit() }
+    val temEspecial = senha.any {
+        !it.isLetterOrDigit() && !it.isWhitespace()
+    }
+
+    return senha.length >= 8 &&
+            temMaiuscula &&
+            temNumero &&
+            temEspecial
+}
