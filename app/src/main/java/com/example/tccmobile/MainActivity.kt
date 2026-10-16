@@ -1,10 +1,8 @@
 package com.example.tccmobile
 
-import android.R.attr.contentDescription
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -37,7 +34,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
@@ -56,14 +55,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TCCMobileTheme {
                 TCCMobileTheme {
                     LoginScreen()
                 }
-
             }
         }
-    }
     }
 
 private val Fundo = Color(0xFFFFFCF8)
@@ -86,6 +82,20 @@ fun LoginScreen() {
 
     var tentouEntrar by rememberSaveable { mutableStateOf(false) }
 
+    var emailFoiValidado by rememberSaveable { mutableStateOf(false) }
+
+    var senhaFoiValidada by rememberSaveable { mutableStateOf(false) }
+
+    var mensagemResultado by rememberSaveable { mutableStateOf("") }
+
+    val emailFocusRequester = remember {
+        FocusRequester()
+    }
+
+    val senhaFocusRequester = remember {
+        FocusRequester()
+    }
+
     val focusManager = LocalFocusManager.current
 
 
@@ -97,8 +107,11 @@ fun LoginScreen() {
 
     val formularioValido = emailValido && senhaValida
 
-    val mostrarErroEmail = tentouEntrar && !emailValido
-    val mostrarErroSenha = tentouEntrar && !senhaValida
+    val mostrarErroEmail =
+        email.isNotBlank() && (emailFoiValidado || tentouEntrar) && !emailValido
+
+    val mostrarErroSenha =
+        senha.isNotBlank() && (senhaFoiValidada || tentouEntrar) && !senhaValida
 
 
     Column(
@@ -170,9 +183,16 @@ fun LoginScreen() {
 
                 onValueChange = {
                     email = it
+                    mensagemResultado = ""
                 },
 
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .focusRequester(emailFocusRequester)
+                    .onFocusChanged { foco ->
+                        if (!foco.isFocused) {
+                            emailFoiValidado = true
+                        }
+                    },
 
                 placeholder = {
                     Text(
@@ -193,16 +213,17 @@ fun LoginScreen() {
 
                 keyboardActions = KeyboardActions(
                     onNext = {
-                        focusManager.moveFocus(
-                            androidx.compose.ui.focus.FocusDirection.Down
-                        )
+                       emailFoiValidado = true
+
+                        if (emailValido) {
+                            senhaFocusRequester.requestFocus()
+                        } else {
+                            emailFocusRequester.requestFocus()
+                        }
                     }
                 ),
 
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(
-                    18.dp
-                ),
-
+                shape = RoundedCornerShape(18.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = Borda,
                     focusedBorderColor = Verde,
@@ -216,8 +237,9 @@ fun LoginScreen() {
                 supportingText = {
                     if (mostrarErroEmail) {
                         Text(
-                            text = "Digite um E-mail válido.",
-                            color = VermelhoErro
+                            text = "E-mail inválido. Use apenas letras minúsculas e números antes de @gmail.com, seguindo as regras de cadastro.",
+                            color = VermelhoErro,
+                            modifier = Modifier.padding(top = 5.dp)
                         )
                     }
                 }
@@ -247,7 +269,12 @@ fun LoginScreen() {
                     senha = it
                 },
 
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .onFocusChanged { foco ->
+                        if (!foco.isFocused) {
+                            senhaFoiValidada = true
+                        }
+                    },
 
                 placeholder = {
                     Text(
@@ -320,7 +347,7 @@ fun LoginScreen() {
                 supportingText = {
                     if (mostrarErroSenha) {
                         Text(
-                            text = "A senha deve possuir pelo menos 8 caracteres.",
+                            text = "A senha deve possuir pelo menos 12 caracteres, uma letra maiúscula, um número e um caractere especial.",
                             color = VermelhoErro
                         )
                     }
@@ -358,15 +385,30 @@ fun LoginScreen() {
             Button(
                 onClick = {
                     tentouEntrar = true
+                    emailFoiValidado = true
+                    senhaFoiValidada = true
+                    mensagemResultado = ""
 
-                    if (formularioValido) {
-                        focusManager.clearFocus()
+                    when {
 
-                        //futuramente chamada para o ViewModel
-                        //ViewModel -> API
+                        !emailValido -> {
+                            emailFocusRequester.requestFocus()
+                        }
+
+                        !senhaValida -> {
+                            senhaFocusRequester.requestFocus()
+                        }
+                        else -> {
+                            focusManager.clearFocus()
+
+                            //os campos passaram pelas validações
+                            mensagemResultado = "Dados preenchidos corretamente"
+
+                            //futuramente chamada para o ViewModel
+                            //ViewModel -> API
+                        }
                     }
                 },
-                enabled = formularioValido,
 
                 modifier = Modifier
                     .fillMaxWidth()
@@ -592,7 +634,7 @@ private fun validarSenha(senha: String): Boolean {
         !it.isLetterOrDigit() && !it.isWhitespace()
     }
 
-    return senha.length >= 8 &&
+    return senha.length >= 12 &&
             temMaiuscula &&
             temNumero &&
             temEspecial
