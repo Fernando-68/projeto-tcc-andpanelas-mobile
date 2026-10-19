@@ -3,6 +3,7 @@ package com.example.tccmobile
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -41,14 +43,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tccmobile.ui.theme.PlayfairDisplay
 import com.example.tccmobile.ui.theme.TCCMobileTheme
 
 class MainActivity : ComponentActivity() {
@@ -270,6 +276,7 @@ fun LoginScreen() {
                 },
 
                 modifier = Modifier.fillMaxWidth()
+                    .focusRequester(senhaFocusRequester)
                     .onFocusChanged { foco ->
                         if (!foco.isFocused) {
                             senhaFoiValidada = true
@@ -506,6 +513,7 @@ fun LoginScreen() {
 
 // HERO DA TELA DE LOGIN
 
+
 @Composable
 fun HeroArea() {
     Box(
@@ -513,79 +521,69 @@ fun HeroArea() {
             .fillMaxWidth()
             .height(228.dp)
     ) {
-        androidx.compose.foundation.Image(
-            painter = painterResource(
-                id = R.drawable.hero_area
-            ),
+        // Imagem de fundo
+        Image(
+            painter = painterResource(id = R.drawable.hero_area),
             contentDescription = "Pessoa cozinhando",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
 
+        // Escurecimento da imagem
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Color.Black.copy(
-                        alpha = 0.38f
-                    )
-                )
+                .background(Color.Black.copy(alpha = 0.38f))
         )
 
+        // Logo e frase na ordem do protótipo
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(
-                    horizontal = 30.dp
-                ),
+                .padding(horizontal = 30.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            // LOGO
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "&",
-                    color = Color(0xff71c9c5),
-                    fontSize = 48.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Serif
-                )
-
-                Text(
-                    text = "Panelas",
-                    color = Color.White,
-                    fontSize = 44.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Serif
-                )
-            }
-
-            Spacer(
-                modifier = Modifier.height(12.dp)
+            // Logo original
+            Image(
+                painter = painterResource(
+                    id = R.drawable.logo_panelas
+                ),
+                contentDescription = "Logo &Panelas",
+                modifier = Modifier
+                    .width(270.dp)
+                    .height(70.dp),
+                contentScale = ContentScale.Fit,
+                alignment = Alignment.CenterStart
             )
 
-            // FRASE
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Row {
-                Text(
-                    text = "Conecte-se pela ",
-                    color = Color.White,
-                    fontSize = 27.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Serif
-                )
+            // Frase com as cores do protótipo
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(
+                        SpanStyle(
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) {
+                        append("Conecte-se pela ")
+                    }
 
-                Text(
-                    text = "cozinha",
-                    color = Amarelo,
-                    fontSize = 27.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Serif
-                )
-            }
+                    withStyle(
+                        SpanStyle(
+                            color = Amarelo,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) {
+                        append("cozinha.")
+                    }
+                },
+                fontFamily = PlayfairDisplay,
+                fontSize = 27.sp,
+                lineHeight = 34.sp
+            )
         }
     }
 }
