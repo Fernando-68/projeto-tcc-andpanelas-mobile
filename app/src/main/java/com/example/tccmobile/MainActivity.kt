@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
         setContent {
                 TCCMobileTheme {
                     LoginScreen()
+                    CadastroScreen { }
                 }
             }
         }
