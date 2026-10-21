@@ -54,20 +54,53 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.example.tccmobile.ui.theme.PlayfairDisplay
 import com.example.tccmobile.ui.theme.TCCMobileTheme
+import com.example.tccmobile.LoginScreen
+import com.example.tccmobile.CadastroScreen
+import com.example.tccmobile.navigation.Routes
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
-                TCCMobileTheme {
-                    LoginScreen()
-                    CadastroScreen { }
+            TCCMobileTheme {
+
+                val navController = rememberNavController()
+
+                NavHost(
+                    navController = navController,
+                    startDestination = Routes.LOGIN
+                ) {
+                    composable(
+                        route = Routes.LOGIN
+                    ) {
+                        LoginScreen(
+                            onCadastrarClick = {
+                                navController.navigate(Routes.CADASTRO)
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Routes.CADASTRO
+                    ) {
+                        CadastroScreen(
+                            onVoltarLogin = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
                 }
             }
         }
     }
+}
 
 private val Fundo = Color(0xFFFFFCF8)
 private val Marrom = Color(0xFF38251A)
@@ -79,7 +112,9 @@ private val Amarelo = Color(0xFFE7A52E)
 private val VermelhoErro = Color(0xFFB3261E)
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    onCadastrarClick: () -> Unit
+) {
 
     var email by rememberSaveable { mutableStateOf("") }
 
@@ -500,12 +535,16 @@ fun LoginScreen() {
                         //futuramente navegar para cadastro
                     }
                 ) {
-                    Text(
-                        text = "Cadastre-se",
-                        color = Verde,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    TextButton(
+                        onClick = onCadastrarClick
+                    ) {
+                        Text(
+                            text = "Cadastre-se",
+                            color = Verde,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
         }

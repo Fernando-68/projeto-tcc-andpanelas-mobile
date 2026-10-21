@@ -1,5 +1,10 @@
 package com.example.tccmobile
 
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.time.format.ResolverStyle
+import java.util.Locale
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,6 +62,52 @@ fun CadastroScreen (
     var senha by rememberSaveable { mutableStateOf("") }
     var senhaVisivel by rememberSaveable { mutableStateOf(false) }
     var aceitouTermos by rememberSaveable { mutableStateOf(false) }
+
+    var tentouCriarConta by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    val erroNome = if (tentouCriarConta &&
+        !validarNomeCompleto(nome)
+        ) {
+        "Informe um nome válido, entre 2 e 100 caracteres."
+    } else {
+        null
+    }
+
+    val erroUsuario = if (tentouCriarConta &&
+        !validarUsuario(usuario)
+        ) {
+        "Use letras, números, ponto ou _ (underline), sem pontos consecutivos"
+    } else {
+        null
+    }
+
+    val erroEmail = if (tentouCriarConta &&
+        !validarEmailCadastro(email)
+        ) {
+        "Informe um Email válido, terminado em gmail.com."
+    } else {
+        null
+    }
+
+    val erroDataNascimento = if (tentouCriarConta &&
+        !validarDataNascimento(dataNascimento)
+        ) {
+        "Informe uma data válida e tenha pelo menos 10 anos."
+    } else {
+        null
+    }
+
+    val erroSenha = if (tentouCriarConta &&
+        !validarSenhaCadastro(senha)
+        ) {
+        "Use 12 caracteres ou mais, com letra maiúscula. número e símbolo."
+    } else {
+        null
+    }
+
+    val erroTermos = tentouCriarConta && !aceitouTermos
 
     Column(
         modifier = Modifier
@@ -206,10 +257,23 @@ fun CadastroScreen (
 
             //NOME COMPLETO
             CampoCadastro(
+                rotulo = "Nome Completo",
+                valor = nome,
+                aoAlterar = { nome = it },
+                placeholder = "Seu nome completo",
+                erro =  erroNome
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            // NOME USUÁRIO
+            CampoCadastro(
                 rotulo = "Nome de usuário",
                 valor = usuario,
                 aoAlterar = { usuario = it },
-                placeholder = "@seuusuario"
+                placeholder = "@seuusuario",
+                erro = erroUsuario
+
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -219,7 +283,8 @@ fun CadastroScreen (
                 rotulo = "E-mail",
                 valor = email,
                 aoAlterar = { email = it },
-                placeholder = "seu@email.com"
+                placeholder = "seu@email.com",
+                erro = erroEmail
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -229,7 +294,8 @@ fun CadastroScreen (
                 rotulo = "Data de nascimento",
                 valor = dataNascimento,
                 aoAlterar = { dataNascimento = it },
-                placeholder = "DD/MM/AAAA"
+                placeholder = "DD/MM/AAAA",
+                erro = erroDataNascimento
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -276,14 +342,22 @@ fun CadastroScreen (
                 },
                 shape = RoundedCornerShape(18.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = BordaCadastro,
-                    focusedBorderColor = VerdeCadastro,
+                    unfocusedBorderColor = if (erroSenha != null) {
+                        Color(0xffb3261e)
+                    } else {
+                        BordaCadastro
+                    },
+                    focusedBorderColor = if (erroSenha != null) {
+                        Color(0xffb3261e)
+                    } else {
+                        VerdeCadastro
+                    },
                     unfocusedContainerColor = FundoCadastro,
                     focusedContainerColor = FundoCadastro,
                     focusedTextColor = MarromCadastro,
                     unfocusedTextColor = MarromCadastro,
                     cursorColor = VerdeCadastro
-                )
+                ),
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -318,7 +392,19 @@ fun CadastroScreen (
             //BOTÃO CRIAR CONTA
             Button(
                 onClick = {
-                    //A validação será implementada depois.
+                    tentouCriarConta = true
+
+                    val formularioValido =
+                        validarNomeCompleto(nome) &&
+                                validarUsuario(usuario) &&
+                                validarEmailCadastro(email) &&
+                                validarDataNascimento(dataNascimento) &&
+                                validarSenhaCadastro(senha) &&
+                                aceitouTermos
+
+                    if (formularioValido) {
+                        // Futuramente enviar os dados para a API
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -355,12 +441,110 @@ fun CadastroScreen (
     }
 }
 
+private fun validarNomeCompleto(nome: String): Boolean {
+    val nomeLimpo = nome.trim()
+
+    val padrao = Regex(
+        "[\\p{L}]+(?:[ '\\u002D][\\p{L}]+)*$"
+    )
+
+    return nomeLimpo.length in 2..100 &&
+            padrao.matches(nomeLimpo)
+}
+
+private fun validarUsuario(usuario: String): Boolean{
+    if (usuario.length !in 1..30) return false
+
+    val padrao = Regex("[a-zA-Z0-9._]+$")
+
+    if (!padrao.matches(usuario)) return false
+    if (usuario.startsWith(".") || usuario.endsWith(".")) {
+        return false
+    }
+    if (".." in usuario) return false
+
+    val reservados = setOf(
+        "admin",
+        "administrador",
+        "suporte",
+        "&panelas",
+        "oficial"
+    )
+
+    return usuario.lowercase(Locale.ROOT) !in reservados
+}
+
+private fun validarEmailCadastro(email: String): Boolean {
+    val emailNormalizado = email.trim()
+
+    val padraoEmail = Regex(
+        "^[a-z]+[a-z0-9]*gmail\\.com$"
+    )
+
+    if (!padraoEmail.matches(emailNormalizado)) {
+        return false
+    }
+
+    val nomeUsuario = emailNormalizado.substringBefore("@")
+    val letras = nomeUsuario.count { it in 'a'..'z' }
+    val numeros = nomeUsuario.count { it in '0'..'9' }
+
+    if (letras == 0) return false
+    if (letras == 1 && numeros > 0) return false
+    if (numeros > 0 && letras < 2) return false
+
+    return true
+}
+
+private fun validarSenhaCadastro(senha: String): Boolean {
+    val temMaiuscula = senha.any { it.isUpperCase() }
+    val temNumero = senha.any { it.isDigit() }
+    val temEspecial = senha.any {
+        !it.isLetterOrDigit() && !it.isWhitespace()
+    }
+
+    val senhasComuns = setOf(
+        "123456",
+        "123456789",
+        "password",
+        "password123",
+        "&panelas123",
+        "qwerty123"
+    )
+
+    return senha.length >= 12 &&
+            temMaiuscula &&
+            temNumero &&
+            temEspecial &&
+            senha.lowercase(Locale.ROOT) !in senhasComuns
+}
+
+private fun validarDataNascimento(data: String): Boolean {
+    return try {
+        val formato = DateTimeFormatter
+            .ofPattern("dd/MM/uuuu")
+            .withResolverStyle(ResolverStyle.STRICT)
+
+        val nascimento = LocalDate.parse(data, formato)
+        val hoje = LocalDate.now()
+
+        if (nascimento.isAfter(hoje)) {
+            return false
+        }
+
+        Period.between(nascimento, hoje).years >=10
+    } catch (e: Exception) {
+        false
+    }
+}
+
     @Composable
     private fun CampoCadastro(
         rotulo: String,
         valor: String,
         aoAlterar: (String) -> Unit,
-        placeholder: String
+        placeholder: String,
+        erro: String? = null
     ) {
         Column {
             Text(
@@ -386,16 +570,37 @@ fun CadastroScreen (
                     )
                 },
                 singleLine = true,
+                isError = erro != null,
                 shape = RoundedCornerShape(18.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = BordaCadastro,
-                    focusedBorderColor = VerdeCadastro,
+                    unfocusedBorderColor = if (erro != null) {
+                        Color(0xffb3261e)
+                    } else {
+                        BordaCadastro
+                    },
+                    focusedBorderColor = if (erro != null) {
+                        Color(0xffb3261e)
+                    } else {
+                        VerdeCadastro
+                    },
                     unfocusedContainerColor = FundoCadastro,
                     focusedContainerColor = FundoCadastro,
                     focusedTextColor = MarromCadastro,
                     unfocusedTextColor = MarromCadastro,
-                    cursorColor = VerdeCadastro
+                    cursorColor = VerdeCadastro,
+                    errorBorderColor = Color(0xffb3261e),
+                    errorCursorColor = Color(0xffb3261e)
                 )
             )
+
+            if (erro != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = erro,
+                    color = Color(0xffb3261e),
+                    fontSize = 12.sp
+                )
+            }
         }
     }
