@@ -324,6 +324,7 @@ fun CadastroScreen (
                     )
                 },
                 singleLine = true,
+                isError = erroSenha != null,
                 visualTransformation = if (senhaVisivel) {
                     androidx.compose.ui.text.input.VisualTransformation.None
                 } else {
@@ -356,9 +357,21 @@ fun CadastroScreen (
                     focusedContainerColor = FundoCadastro,
                     focusedTextColor = MarromCadastro,
                     unfocusedTextColor = MarromCadastro,
-                    cursorColor = VerdeCadastro
+                    cursorColor = VerdeCadastro,
+                    errorBorderColor = Color(0xffb3261e),
+                    errorCursorColor = Color(0xffb3261e)
                 ),
             )
+
+            if (erroSenha != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = erroSenha,
+                    color = Color(0xffb3261e),
+                    fontSize = 12.sp
+                )
+            }
 
             Spacer(modifier = Modifier.height(18.dp))
 
@@ -384,6 +397,15 @@ fun CadastroScreen (
                     color = CinzaCadastro,
                     fontSize = 13.sp,
                     lineHeight = 19.sp
+                )
+            }
+
+            if (erroTermos) {
+                Text(
+                    text = "Você precisa aceitar os Termos de Uso e Privacidade.",
+                    color = Color(0xffb3261e),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 12.dp)
                 )
             }
 
@@ -445,7 +467,7 @@ private fun validarNomeCompleto(nome: String): Boolean {
     val nomeLimpo = nome.trim()
 
     val padrao = Regex(
-        "[\\p{L}]+(?:[ '\\u002D][\\p{L}]+)*$"
+        "^[\\p{L}]+(?:[ '\\u002D][\\p{L}]+)*$"
     )
 
     return nomeLimpo.length in 2..100 &&
@@ -478,7 +500,7 @@ private fun validarEmailCadastro(email: String): Boolean {
     val emailNormalizado = email.trim()
 
     val padraoEmail = Regex(
-        "^[a-z]+[a-z0-9]*gmail\\.com$"
+        "^[a-z]+[a-z0-9]*@gmail\\.com$"
     )
 
     if (!padraoEmail.matches(emailNormalizado)) {
