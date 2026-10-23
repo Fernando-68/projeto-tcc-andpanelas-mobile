@@ -1,6 +1,7 @@
 package com.example.tccmobile
 
 import android.os.Bundle
+import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -54,6 +55,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -93,6 +96,37 @@ class MainActivity : ComponentActivity() {
                         CadastroScreen(
                             onVoltarLogin = {
                                 navController.popBackStack()
+                            },
+                            onCadastroConcluido = { email ->
+                                navController.navigate(
+                                    Routes.VERIFICACAO_CODIGO.replace(
+                                        "{email}",
+                                        Uri.encode(email)
+                                    )
+                                )
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Routes.VERIFICACAO_CODIGO,
+                        arguments = listOf(
+                            navArgument("email") {
+                                type = NavType.StringType
+                            }
+                        )
+                    ) { backStackEntry ->
+
+                        val emailRecebido =
+                            backStackEntry.arguments?.getString("email") ?: ""
+
+                        VerificacaoCodigoScreen(
+                            email = emailRecebido,
+                            onVerificarClick = { codigo ->
+                                // A validação do código será implementada depois.
+                            },
+                            onReenviarCodigo = {
+                                // O reenvio do e-mail será implementado depois.
                             }
                         )
                     }
@@ -101,6 +135,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
 
 private val Fundo = Color(0xFFFFFCF8)
 private val Marrom = Color(0xFF38251A)
@@ -530,11 +566,6 @@ fun LoginScreen(
                     fontSize = 17.sp
                 )
 
-                TextButton(
-                    onClick = {
-                        //futuramente navegar para cadastro
-                    }
-                ) {
                     TextButton(
                         onClick = onCadastrarClick
                     ) {
@@ -549,7 +580,7 @@ fun LoginScreen(
             }
         }
     }
-}
+
 
 // HERO DA TELA DE LOGIN
 

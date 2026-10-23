@@ -53,7 +53,8 @@ private val BordaCadastro = Color(0xfff0e5d2)
 
 @Composable
 fun CadastroScreen (
-    onVoltarLogin: () -> Unit
+    onVoltarLogin: () -> Unit,
+    onCadastroConcluido: (String) -> Unit
 ) {
     var nome by rememberSaveable { mutableStateOf("") }
     var usuario by rememberSaveable { mutableStateOf("") }
@@ -425,6 +426,7 @@ fun CadastroScreen (
                                 aceitouTermos
 
                     if (formularioValido) {
+                        onCadastroConcluido(email.trim())
                         // Futuramente enviar os dados para a API
                     }
                 },
