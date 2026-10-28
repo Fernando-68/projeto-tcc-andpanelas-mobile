@@ -86,6 +86,9 @@ class MainActivity : ComponentActivity() {
                         LoginScreen(
                             onCadastrarClick = {
                                 navController.navigate(Routes.CADASTRO)
+                            },
+                            onEsqueceuSenhaClick = {
+                                navController.navigate(Routes.ESQUECEU_SENHA)
                             }
                         )
                     }
@@ -130,6 +133,17 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+
+                    composable(Routes.ESQUECEU_SENHA) {
+                        EsqueceuSenhaScreen(
+                            onVoltarLogin = {
+                                navController.popBackStack()
+                            },
+                            onEnviarCodigo = { email ->
+                                // A próxima etapa será conectada posteriormente.
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -149,7 +163,8 @@ private val VermelhoErro = Color(0xFFB3261E)
 
 @Composable
 fun LoginScreen(
-    onCadastrarClick: () -> Unit
+    onCadastrarClick: () -> Unit,
+    onEsqueceuSenhaClick: () -> Unit
 ) {
 
     var email by rememberSaveable { mutableStateOf("") }
@@ -433,7 +448,7 @@ fun LoginScreen(
                 }
             )
 
-            // ESQUECI A SENHA
+            // ESQUECEU A SENHA
 
             Row(
                 modifier = Modifier
@@ -443,7 +458,7 @@ fun LoginScreen(
             ) {
                 TextButton(
                     onClick = {
-                        //futuramente navegar para recuperação de senha
+                        onEsqueceuSenhaClick()
                     }
                 ) {
                     Text(
