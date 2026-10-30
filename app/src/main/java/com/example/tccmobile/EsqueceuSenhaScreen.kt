@@ -40,6 +40,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 
 private val FundoEsqueceu = Color(0xfffffcf8)
 private val MarromEsqueceu = Color(0xff38251a)
@@ -48,12 +53,34 @@ private val BordaEsqueceu = Color(0xfff0e5d2)
 private val TextoEsqueceu = Color(0xff66564b)
 private val CinzaEsqueceu = Color(0xff9aa887)
 
+private val VermelhoEsqueceu = Color(0xffD9534F)
+
 @Composable
 fun EsqueceuSenhaScreen(
     onVoltarLogin: () -> Unit,
     onEnviarCodigo: (String) -> Unit
 ) {
     var email by rememberSaveable { mutableStateOf("") }
+
+    var tentouEnviar by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+//    val emailValido = validarEmail(email)
+//
+//    val emailComErro = tentouEnviar && !emailValido
+//
+//    val context = LocalContext.current
+//
+//    val emailDataStore = remember {
+//        EmailDataStore(context)
+//    }
+//
+//    val emailSalvo = emailDataStore.emailSalvo.collectAsState(
+//        initial = ""
+//    )
+//
+//    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -105,62 +132,9 @@ fun EsqueceuSenhaScreen(
         }
 
         // INDICADOR DE ETAPAS
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(5.dp)
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(3.dp)
-                        .background(VerdeEsqueceu, RoundedCornerShape(4.dp))
-                )
-
-                Spacer(modifier = Modifier.height(5.dp))
-
-                Text(
-                    text = "1. IDENTIFICAÇÃO",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MarromEsqueceu
-                )
-            }
-
-            Column(modifier = Modifier.weight(1f)) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(3.dp)
-                        .background(BordaEsqueceu, RoundedCornerShape(4.dp))
-                )
-
-                Spacer(modifier = Modifier.height(5.dp))
-
-                Text(
-                    text = "2. CÓDIGO ENVIADO",
-                    fontSize = 10.sp,
-                    color = CinzaEsqueceu
-                )
-            }
-
-            Column(modifier = Modifier.weight(1f)) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(3.dp)
-                        .background(BordaEsqueceu, RoundedCornerShape(4.dp))
-                )
-
-                Spacer(modifier = Modifier.height(5.dp))
-
-                Text(
-                    text = "3. NOVA SENHA",
-                    fontSize = 10.sp,
-                    color = CinzaEsqueceu
-                )
-            }
-        }
+        IndicadorEtapas(
+            etapaAtual = 1
+        )
 
         // CONTEÚDO PRINCIPAL
         Column(
@@ -212,7 +186,7 @@ fun EsqueceuSenhaScreen(
                     fontSize = 17.sp
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
                     text = "Verifique sua caixa de entrada após o envio — o código chega em segundos!",
@@ -257,9 +231,18 @@ fun EsqueceuSenhaScreen(
                     keyboardType = KeyboardType.Email
                 ),
                 shape = RoundedCornerShape(10.dp),
+                isError = emailComErro,
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = BordaEsqueceu,
-                    focusedBorderColor = VerdeEsqueceu,
+                    unfocusedBorderColor = if (emailComErro) {
+                        VermelhoEsqueceu
+                    } else {
+                        BordaEsqueceu
+                    },
+                    focusedBorderColor = if (emailComErro) {
+                        VermelhoEsqueceu
+                    } else {
+                        VerdeEsqueceu
+                    },
                     unfocusedContainerColor = FundoEsqueceu,
                     focusedContainerColor = FundoEsqueceu,
                     focusedTextColor = MarromEsqueceu,
@@ -267,14 +250,27 @@ fun EsqueceuSenhaScreen(
                     cursorColor = VerdeEsqueceu
                 )
             )
+            if (emailComErro) {
+                Text(
+                    text = "Digite um e-mail válido, usando letras minúsculas e números antes de @gmail.com.",
+                    color = VermelhoEsqueceu,
+                    fontSize = 10.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(18.dp))
 
             // BOTÃO ENVIAR CÓDIGO
             Button(
                 onClick = {
+                    tentouEnviar = true
                     // A navegação para a próxima etapa será ligada depois
-                    onEnviarCodigo(email.trim())
+                    if (emailValido) {
+                        onEnviarCodigo(email.trim())
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -300,6 +296,12 @@ fun EsqueceuSenhaScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
+                    text = "Lembrou a senha? ",
+                    color = CinzaEsqueceu,
+                    fontSize = 12.sp
+                )
+
+                Text(
                     text = "Entrar",
                     color = VerdeEsqueceu,
                     fontSize = 12.sp,
@@ -311,4 +313,235 @@ fun EsqueceuSenhaScreen(
             }
         }
     }
+}
+
+
+
+@Composable
+private fun IndicadorEtapas(
+    etapaAtual: Int
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        // BARRAS SUPERIORES
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(3) { indice ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(3.dp)
+                        .background(
+                            color = if (indice + 1 <= etapaAtual) {
+                                VerdeEsqueceu
+                            } else {
+                                BordaEsqueceu
+                            },
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                )
+
+                if (indice < 2) {
+                    Spacer(modifier = Modifier.width(7.dp))
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        // NOMES DAS ETAPAS E INDICADORES
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            // PRIMEIRA ETAPA
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "1. IDENTIFICAÇÃO",
+                    fontSize = 8.sp,
+                    fontWeight = if (etapaAtual == 1) {
+                        FontWeight.Bold
+                    } else {
+                        FontWeight.Normal
+                    },
+                    color = if (etapaAtual == 1) {
+                        MarromEsqueceu
+                    } else {
+                        CinzaEsqueceu
+                    },
+                    maxLines = 1
+                )
+
+                if (etapaAtual >= 1) {
+                    Box(
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        IndicadorSeparacao(
+                            etapaConcluida = etapaAtual > 1,
+                            etapaEmAndamento = etapaAtual == 1
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(7.dp))
+
+            // SEGUNDA ETAPA
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "2. CÓDIGO ENVIADO",
+                    fontSize = 8.sp,
+                    fontWeight = if (etapaAtual == 2) {
+                        FontWeight.Bold
+                    } else {
+                        FontWeight.Normal
+                    },
+                    color = if (etapaAtual == 2) {
+                        MarromEsqueceu
+                    } else {
+                        CinzaEsqueceu
+                    },
+                    maxLines = 1
+                )
+
+                if (etapaAtual >= 2) {
+                    Box(
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        IndicadorSeparacao(
+                            etapaConcluida = etapaAtual > 2,
+                            etapaEmAndamento = etapaAtual == 2
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(7.dp))
+
+            // TERCEIRA ETAPA
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "3. NOVA SENHA",
+                    fontSize = 8.sp,
+                    fontWeight = if (etapaAtual == 3) {
+                        FontWeight.Bold
+                    } else {
+                        FontWeight.Normal
+                    },
+                    color = if (etapaAtual == 3) {
+                        MarromEsqueceu
+                    } else {
+                        CinzaEsqueceu
+                    },
+                    maxLines = 1
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun IndicadorSeparacao(
+    etapaConcluida: Boolean,
+    etapaEmAndamento: Boolean
+) {
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 3.dp)
+            .size(9.dp),
+        contentAlignment = Alignment.Center
+    ) {
+
+        // ETAPA CONCLUÍDA: DESENHA UM CHECK
+        if (etapaConcluida) {
+
+            Canvas(
+                modifier = Modifier.size(9.dp)
+            ) {
+                val caminho = Path().apply {
+                    moveTo(
+                        size.width * 0.15f,
+                        size.height * 0.50f
+                    )
+
+                    lineTo(
+                        size.width * 0.40f,
+                        size.height * 0.75f
+                    )
+
+                    lineTo(
+                        size.width * 0.85f,
+                        size.height * 0.25f
+                    )
+                }
+
+                drawPath(
+                    path = caminho,
+                    color = VerdeEsqueceu,
+                    style = Stroke(
+                        width = 2.dp.toPx(),
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round
+                    )
+                )
+            }
+
+            // ETAPA EM ANDAMENTO: DESENHA UM PONTO
+        } else if (etapaEmAndamento) {
+
+            Box(
+                modifier = Modifier
+                    .size(5.dp)
+                    .background(
+                        color = VerdeEsqueceu,
+                        shape = CircleShape
+                    )
+            )
+        }
+    }
+}
+
+
+
+private fun validarEmail(email: String): Boolean {
+
+    val emailLimpo = email.trim()
+
+    val padraoEmail = Regex("^[a-z]+[a-z0-9]*@gmail\\.com$")
+
+    if (!padraoEmail.matches(emailLimpo)) {
+        return false
+    }
+
+    val usuario = emailLimpo.substringBefore("@")
+
+    val quantidadeLetras = usuario.count {
+        it in 'a'..'z'
+    }
+
+    val quantidadeNumeros = usuario.count {
+        it in '0'..'9'
+    }
+
+    if (quantidadeLetras == 0) {
+        return false
+    }
+
+    if (quantidadeLetras == 1 && quantidadeNumeros > 0) {
+        return false
+    }
+
+    return true
 }

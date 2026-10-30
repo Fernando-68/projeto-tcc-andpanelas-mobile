@@ -65,6 +65,10 @@ import com.example.tccmobile.ui.theme.TCCMobileTheme
 import com.example.tccmobile.LoginScreen
 import com.example.tccmobile.CadastroScreen
 import com.example.tccmobile.navigation.Routes
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import com.example.tccmobile.data.EmailDataStore
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -205,6 +209,12 @@ fun LoginScreen(
 
     val mostrarErroSenha =
         senha.isNotBlank() && (senhaFoiValidada || tentouEntrar) && !senhaValida
+
+    val context = LocalContext.current
+    val emailDataStore = remember {
+        EmailDataStore(context)
+    }
+    val coroutineScope = rememberCoroutineScope()
 
 
     Column(
@@ -494,6 +504,10 @@ fun LoginScreen(
                         }
                         else -> {
                             focusManager.clearFocus()
+
+                            coroutineScope.launch {
+                                emailDataStore.salvarEmail(email.trim())
+                            }
 
                             //os campos passaram pelas validações
                             mensagemResultado = "Dados preenchidos corretamente"
