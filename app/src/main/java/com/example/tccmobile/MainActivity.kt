@@ -2,6 +2,7 @@ package com.example.tccmobile
 
 import android.os.Bundle
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -144,7 +145,68 @@ class MainActivity : ComponentActivity() {
                                 navController.popBackStack()
                             },
                             onEnviarCodigo = { email ->
-                                // A próxima etapa será conectada posteriormente.
+                                navController.navigate(
+                                    Routes.CODIGO_RECUPERACAO.replace(
+                                        "{email}",
+                                        Uri.encode(email)
+                                    )
+                                )
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Routes.CODIGO_RECUPERACAO,
+                        arguments = listOf(
+                            navArgument("email") {
+                                type = NavType.StringType
+                            }
+                        )
+                    ) { backStackEntry ->
+
+                        val emailRecebido =
+                            backStackEntry.arguments?.getString("email") ?: ""
+
+                        CodigoRecuperacaoScreen(
+                            email = emailRecebido,
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+                            onVerificarCodigo = { codigo ->
+                                if (codigo == "000000") {
+                                    navController.navigate(Routes.NOVA_SENHA)
+                                }
+                            },
+                            onReenviarCodigo = {
+                                // O reenvio do código será implementado posteriormente.
+                            }
+                        )
+                    }
+
+                    composable (Routes.NOVA_SENHA){
+                        NovaSenhaScreen(
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+                            onSalvarNovaSenha = { senha, confirmarSenha ->
+
+                                // Simulação de redefinição de senha.
+                                // A persistência real será implementada com a API.
+
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Senha redefinida com sucesso! (simulação)",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                navController.navigate(Routes.LOGIN) {
+
+                                    popUpTo(Routes.LOGIN) {
+                                        inclusive = false
+                                    }
+
+                                    launchSingleTop = true
+                                }
                             }
                         )
                     }
@@ -451,7 +513,7 @@ fun LoginScreen(
                 supportingText = {
                     if (mostrarErroSenha) {
                         Text(
-                            text = "A senha deve possuir pelo menos 12 caracteres, uma letra maiúscula, um número e um caractere especial.",
+                            text = "A senha deve possuir pelo menos 8 caracteres, uma letra maiúscula, um número e um caractere especial.",
                             color = VermelhoErro
                         )
                     }
@@ -732,7 +794,7 @@ private fun validarSenha(senha: String): Boolean {
         !it.isLetterOrDigit() && !it.isWhitespace()
     }
 
-    return senha.length >= 12 &&
+    return senha.length >= 8 &&
             temMaiuscula &&
             temNumero &&
             temEspecial

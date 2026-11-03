@@ -45,6 +45,13 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.example.tccmobile.data.EmailDataStore
+import kotlinx.coroutines.launch
 
 private val FundoEsqueceu = Color(0xfffffcf8)
 private val MarromEsqueceu = Color(0xff38251a)
@@ -66,21 +73,27 @@ fun EsqueceuSenhaScreen(
         mutableStateOf(false)
     }
 
-//    val emailValido = validarEmail(email)
-//
-//    val emailComErro = tentouEnviar && !emailValido
-//
-//    val context = LocalContext.current
-//
-//    val emailDataStore = remember {
-//        EmailDataStore(context)
-//    }
-//
-//    val emailSalvo = emailDataStore.emailSalvo.collectAsState(
-//        initial = ""
-//    )
-//
-//    val coroutineScope = rememberCoroutineScope()
+    val emailValido = validarEmail(email)
+
+    val emailComErro = tentouEnviar && !emailValido
+
+    val context = LocalContext.current
+
+    val emailDataStore = remember {
+        EmailDataStore(context)
+    }
+
+    val emailSalvo = emailDataStore.emailSalvo.collectAsState(
+        initial = ""
+    )
+
+    LaunchedEffect(emailSalvo.value) {
+        if (email.isBlank() && emailSalvo.value.isNotBlank()) {
+            email = emailSalvo.value
+        }
+    }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -269,7 +282,10 @@ fun EsqueceuSenhaScreen(
                     tentouEnviar = true
                     // A navegação para a próxima etapa será ligada depois
                     if (emailValido) {
-                        onEnviarCodigo(email.trim())
+                        coroutineScope.launch {
+                            emailDataStore.salvarEmail(email.trim())
+                            onEnviarCodigo(email.trim())
+                        }
                     }
                 },
                 modifier = Modifier

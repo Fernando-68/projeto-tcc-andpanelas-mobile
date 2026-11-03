@@ -14,7 +14,7 @@ private val Context.dataStore by preferencesDataStore(
 private val CHAVE_EMAIL = stringPreferencesKey("email_usuario")
 
 class EmailDataStore(private val context: Context) {
-    val emailSlavo: Flow<String> = context.dataStore.data.map { preferencias ->
+    val emailSalvo: Flow<String> = context.dataStore.data.map { preferencias ->
         preferencias[CHAVE_EMAIL] ?: ""
     }
 

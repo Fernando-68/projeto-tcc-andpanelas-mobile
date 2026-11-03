@@ -5,5 +5,9 @@ object Routes {
     const val CADASTRO = "cadastro"
     const val VERIFICACAO_CODIGO = "verificacao-codigo/{email}"
     const val ESQUECEU_SENHA = "esqueceu-senha"
+
+    const val CODIGO_RECUPERACAO = "codigo-recuperacao/{email}"
+
+    const val NOVA_SENHA = "nova-sennha"
 }
 
