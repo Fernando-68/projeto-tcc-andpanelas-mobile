@@ -94,6 +94,13 @@ class MainActivity : ComponentActivity() {
                             },
                             onEsqueceuSenhaClick = {
                                 navController.navigate(Routes.ESQUECEU_SENHA)
+                            },
+                            onLoginSucesso = {
+                                navController.navigate(Routes.HOME) {
+                                    popUpTo(Routes.LOGIN) {
+                                        inclusive = true
+                                    }
+                                }
                             }
                         )
                     }
@@ -210,6 +217,10 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+
+                    composable(Routes.HOME) {
+                        HomeScreen()
+                    }
                 }
             }
         }
@@ -230,7 +241,8 @@ private val VermelhoErro = Color(0xFFB3261E)
 @Composable
 fun LoginScreen(
     onCadastrarClick: () -> Unit,
-    onEsqueceuSenhaClick: () -> Unit
+    onEsqueceuSenhaClick: () -> Unit,
+    onLoginSucesso: () -> Unit
 ) {
 
     var email by rememberSaveable { mutableStateOf("") }
@@ -573,6 +585,8 @@ fun LoginScreen(
 
                             //os campos passaram pelas validações
                             mensagemResultado = "Dados preenchidos corretamente"
+
+                            onLoginSucesso()
 
                             //futuramente chamada para o ViewModel
                             //ViewModel -> API

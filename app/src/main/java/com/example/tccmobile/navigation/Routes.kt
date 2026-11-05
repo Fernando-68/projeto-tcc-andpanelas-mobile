@@ -9,5 +9,7 @@ object Routes {
     const val CODIGO_RECUPERACAO = "codigo-recuperacao/{email}"
 
     const val NOVA_SENHA = "nova-sennha"
+
+    const val HOME = "home"
 }
 

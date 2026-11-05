@@ -536,7 +536,7 @@ private fun validarSenhaCadastro(senha: String): Boolean {
         "qwerty123"
     )
 
-    return senha.length >= 12 &&
+    return senha.length >= 8 &&
             temMaiuscula &&
             temNumero &&
             temEspecial &&
