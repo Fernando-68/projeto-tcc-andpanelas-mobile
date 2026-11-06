@@ -8,16 +8,19 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -273,6 +276,12 @@ private fun PerfisHome() {
             nome = "Mariana",
             iniciais = "ML",
             cor = Color(0xff925b2e)
+        )
+
+        PerfilItem(
+            nome = "Carlos",
+            iniciais = "CF",
+            cor = Color(0xFFF44336)
         )
     }
 }
@@ -530,7 +539,11 @@ private fun ReceitaCardHome(
 
     Column(
         modifier = Modifier
-            .width(190.dp)
+            .width(IntrinsicSize.Max)
+            .widthIn(
+                min = 170.dp,
+                max = 230.dp
+            )
             .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
             .border(
@@ -565,7 +578,7 @@ private fun ReceitaCardHome(
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 lineHeight = 20.sp,
-                overflow = TextOverflow.Clip
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(3.dp))
@@ -592,6 +605,7 @@ private fun NavegacaoInferiorHome() {
             .background(FundoHome)
     ) {
 
+        // LINHA DIVISÓRIA
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -599,35 +613,76 @@ private fun NavegacaoInferiorHome() {
                 .background(BordaHome)
         )
 
-        Row(
+        // ÁREA DA NAVEGAÇÃO
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(76.dp)
-                .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
 
-            // INÍCIO
+            // QUATRO ITENS DISTRIBUÍDOS IGUALMENTE
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(76.dp)
+                    .offset(y = (-8).dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-            ItemNavegacaoHome(
-                imagem = R.drawable.home,
-                texto = "Início",
-                selecionado = true
-            )
+                // INÍCIO
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ItemNavegacaoHome(
+                        imagem = R.drawable.home,
+                        texto = "Início",
+                        selecionado = true
+                    )
+                }
 
-            // BUSCAR
+                // BUSCAR
+                Box(
+                    modifier = Modifier.weight(1f)
+                        .offset(x = (-12).dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ItemNavegacaoHome(
+                        imagem = R.drawable.lupa,
+                        texto = "Buscar"
+                    )
+                }
 
-            ItemNavegacaoHome(
-                imagem = R.drawable.lupa,
-                texto = "Buscar"
-            )
+                // COMUNIDADES
+                Box(
+                    modifier = Modifier.weight(1f)
+                        .offset(x = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ItemNavegacaoHome(
+                        imagem = R.drawable.users_alter,
+                        texto = "Comunidades"
+                    )
+                }
+
+                // GELADEIRA
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ItemNavegacaoHome(
+                        imagem = R.drawable.geladeira,
+                        texto = "Geladeira"
+                    )
+                }
+            }
 
             // BOTÃO CENTRAL DE ADIÇÃO
-
             Box(
                 modifier = Modifier
-                    .size(54.dp)
+                    .align(Alignment.Center)
+                    .offset(y = (-34).dp)
+                    .size(46.dp)
                     .background(
                         VerdeHome,
                         CircleShape
@@ -637,28 +692,13 @@ private fun NavegacaoInferiorHome() {
                     },
                 contentAlignment = Alignment.Center
             ) {
-
                 Text(
                     text = "+",
                     color = Color.White,
-                    fontSize = 36.sp,
+                    fontSize = 32.sp,
                     fontWeight = FontWeight.Light
                 )
             }
-
-            // COMUNIDADES
-
-            ItemNavegacaoHome(
-                imagem = R.drawable.users_alter,
-                texto = "Comunidades"
-            )
-
-            // GELADEIRA
-
-            ItemNavegacaoHome(
-                imagem = R.drawable.geladeira,
-                texto = "Geladeira"
-            )
         }
     }
 }
@@ -670,24 +710,23 @@ private fun ItemNavegacaoHome(
     texto: String,
     selecionado: Boolean = false
 ) {
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
         Image(
             painter = painterResource(imagem),
             contentDescription = texto,
-            modifier = Modifier.size(27.dp)
+            modifier = Modifier.size(20.dp),
+            contentScale = ContentScale.Fit
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(3.dp))
 
         Text(
             text = texto,
             color = if (selecionado) VerdeHome else CinzaHome,
-            fontSize = 12.sp,
+            fontSize = 11.sp,
             fontWeight = if (selecionado) {
                 FontWeight.SemiBold
             } else {
