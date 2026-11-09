@@ -44,6 +44,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tccmobile.ui.theme.PlayfairDisplay
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 
 private val FundoCadastro = Color(0xfffffcf8)
 private val MarromCadastro = Color(0xff38251a)
@@ -54,7 +59,8 @@ private val BordaCadastro = Color(0xfff0e5d2)
 @Composable
 fun CadastroScreen (
     onVoltarLogin: () -> Unit,
-    onCadastroConcluido: (String) -> Unit
+    onCadastroConcluido: (String) -> Unit,
+    onAbrirTermos: () -> Unit
 ) {
     var nome by rememberSaveable { mutableStateOf("") }
     var usuario by rememberSaveable { mutableStateOf("") }
@@ -393,11 +399,45 @@ fun CadastroScreen (
                     )
                 )
 
-                Text(
-                    text = "Li e concordo com os Termos de Uso e Privacidade.",
-                    color = CinzaCadastro,
-                    fontSize = 13.sp,
-                    lineHeight = 19.sp
+                val textoTermos = buildAnnotatedString {
+                    append("Li e concordo com os ")
+
+                    pushStringAnnotation(
+                        tag = "TERMOS",
+                        annotation = "abrir_termos"
+                    )
+
+                    withStyle(
+                        style = SpanStyle(
+                            color = VerdeCadastro,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    ) {
+                        append("Termos de Uso e Privacidade")
+                    }
+
+                    pop()
+
+                    append(".")
+                }
+
+                ClickableText(
+                    text = textoTermos,
+                    style = androidx.compose.ui.text.TextStyle(
+                        color = CinzaCadastro,
+                        fontSize = 13.sp,
+                        lineHeight = 19.sp
+                    ),
+                    onClick = { offset ->
+                        textoTermos.getStringAnnotations(
+                            tag = "TERMOS",
+                            start = offset,
+                            end = offset
+                        ).firstOrNull()?.let {
+                            onAbrirTermos()
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
                 )
             }
 

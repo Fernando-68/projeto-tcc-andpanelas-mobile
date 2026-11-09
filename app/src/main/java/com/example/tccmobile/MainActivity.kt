@@ -114,11 +114,19 @@ class MainActivity : ComponentActivity() {
                             },
                             onCadastroConcluido = { email ->
                                 navController.navigate(
-                                    Routes.VERIFICACAO_CODIGO.replace(
-                                        "{email}",
-                                        Uri.encode(email)
-                                    )
+                                    "verificacao-codigo/$email"
                                 )
+                            },
+                            onAbrirTermos = {
+                                navController.navigate(Routes.TERMOS_PRIVACIDADE)
+                            }
+                        )
+                    }
+
+                    composable (Routes.TERMOS_PRIVACIDADE) {
+                        TermosPrivacidadeScreen(
+                            onvoltar = {
+                                navController.popBackStack()
                             }
                         )
                     }
@@ -138,10 +146,22 @@ class MainActivity : ComponentActivity() {
                         VerificacaoCodigoScreen(
                             email = emailRecebido,
                             onVerificarClick = { codigo ->
-                                // A validação do código será implementada depois.
+                                if (codigo == "000000") {
+                                    navController.navigate(Routes.HOME) {
+
+                                        // Remove as telas de autenticação da pilha de navegação.
+
+                                        popUpTo(Routes.LOGIN) {
+                                            inclusive = true
+                                        }
+
+                                        launchSingleTop = true
+                                    }
+                                }
                             },
                             onReenviarCodigo = {
-                                // O reenvio do e-mail será implementado depois.
+                                // Reenvio simulado.
+                                // A integração com a API será implementada futuramente.
                             }
                         )
                     }
@@ -255,8 +275,6 @@ fun LoginScreen(
 
     var emailFoiValidado by rememberSaveable { mutableStateOf(false) }
 
-    var senhaFoiValidada by rememberSaveable { mutableStateOf(false) }
-
     var mensagemResultado by rememberSaveable { mutableStateOf("") }
 
     val emailFocusRequester = remember {
@@ -282,7 +300,7 @@ fun LoginScreen(
         email.isNotBlank() && (emailFoiValidado || tentouEntrar) && !emailValido
 
     val mostrarErroSenha =
-        senha.isNotBlank() && (senhaFoiValidada || tentouEntrar) && !senhaValida
+        tentouEntrar && !senhaValida
 
     val context = LocalContext.current
     val emailDataStore = remember {
@@ -313,8 +331,8 @@ fun LoginScreen(
                 .padding(
                     start = 30.dp,
                     end = 30.dp,
-                    top = 28.dp,
-                    bottom = 24.dp
+                    top = 18.dp,
+                    bottom = 12.dp
                 )
         ) {
 
@@ -339,7 +357,7 @@ fun LoginScreen(
             )
 
             Spacer(
-                modifier = Modifier.height(30.dp)
+                modifier = Modifier.height(18.dp)
             )
 
             // E-MAIL
@@ -423,7 +441,7 @@ fun LoginScreen(
             )
 
             Spacer(
-                modifier = Modifier.height(18.dp)
+                modifier = Modifier.height(12.dp)
             )
 
             // SENHA
@@ -447,12 +465,7 @@ fun LoginScreen(
                 },
 
                 modifier = Modifier.fillMaxWidth()
-                    .focusRequester(senhaFocusRequester)
-                    .onFocusChanged { foco ->
-                        if (!foco.isFocused) {
-                            senhaFoiValidada = true
-                        }
-                    },
+                    .focusRequester(senhaFocusRequester),
 
                 placeholder = {
                     Text(
@@ -479,13 +492,8 @@ fun LoginScreen(
 
                 keyboardActions = KeyboardActions(
                     onDone = {
+                        tentouEntrar = true
                         focusManager.clearFocus()
-
-                        if (formularioValido) {
-                            tentouEntrar = true
-                        } else {
-                            tentouEntrar = true
-                        }
                     }
                 ),
 
@@ -555,7 +563,7 @@ fun LoginScreen(
             }
 
             Spacer(
-                modifier = Modifier.height(16.dp)
+                modifier = Modifier.height(10.dp)
             )
 
             // BOTÃO ENTRAR
@@ -564,7 +572,6 @@ fun LoginScreen(
                 onClick = {
                     tentouEntrar = true
                     emailFoiValidado = true
-                    senhaFoiValidada = true
                     mensagemResultado = ""
 
                     when {
@@ -620,45 +627,11 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(
-                modifier = Modifier.height(30.dp)
-            )
-
-            // DIVISOR
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(1.dp)
-                        .background(Borda)
-                )
-
-                Text(
-                    text = "OU CONTINUE COM",
-                    color = CinzaTexto,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(
-                        horizontal = 14.dp
-                    )
-                )
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(1.dp)
-                        .background(Borda)
-                )
-            }
-
-            Spacer(
-                modifier = Modifier.height(25.dp)
-            )
-
             // CADASTRO
+
+            Spacer(
+                modifier = Modifier.height(4.dp)
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -671,20 +644,20 @@ fun LoginScreen(
                     fontSize = 17.sp
                 )
 
-                    TextButton(
-                        onClick = onCadastrarClick
-                    ) {
-                        Text(
-                            text = "Cadastre-se",
-                            color = Verde,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+                TextButton(
+                    onClick = onCadastrarClick
+                ) {
+                    Text(
+                        text = "Cadastre-se",
+                        color = Verde,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
     }
+}
 
 
 // HERO DA TELA DE LOGIN
@@ -695,7 +668,7 @@ fun HeroArea() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(228.dp)
+            .height(190.dp)
     ) {
         // Imagem de fundo
         Image(
