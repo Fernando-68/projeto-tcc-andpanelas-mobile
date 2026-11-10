@@ -113,6 +113,13 @@ fun HomeScreen() {
                     ReceitasPopularesHome()
                 }
 
+                "Receitas da semana" -> {
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    ReceitasDaSemanaHome()
+                }
+
                 else -> {
 
                     Spacer(modifier = Modifier.height(34.dp))
@@ -695,6 +702,353 @@ private fun ReceitasPopularesHome() {
         }
     }
 }
+
+@Composable
+private fun ReceitasDaSemanaHome() {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 28.dp)
+    ) {
+
+        // TÍTULO DO RANKING
+
+        Text(
+            text = "Pódio de Receitas \uD83C\uDFC6",
+            color = MarromHome,
+            fontFamily = PlayfairDisplay,
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(22.dp))
+
+        // PRIMEIRO LUGAR
+
+         ReceitaCampeaHome()
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // SEGUNDO LUGAR
+
+        ReceitaRankingCompactaHome(
+            imagem = R.drawable.moqueca_baiana,
+            posicao = "#2 LUGAR · PRATA",
+            nome = "Moqueca Baiana Aromática",
+            tempo = "50 min",
+            dificuldade = "Médio"
+        )
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // TERCEIRO LUGAR
+
+        ReceitaRankingCompactaHome(
+            imagem = R.drawable.picanha_na_brasa_com_alho,
+            posicao = "#3 LUGAR · BRONZE",
+            nome = "Picanha na Brasa com Alho",
+            tempo = "35 min",
+            dificuldade = "Fácil"
+        )
+    }
+}
+
+@Composable
+private fun ReceitaCampeaHome() {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(Color.White)
+            .border(
+                width = 2.dp,
+                color = Color(0xfff0d45d),
+                shape = RoundedCornerShape(24.dp)
+            )
+    ) {
+
+        // IMAGEM E CLASSIFICAÇÃO
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(205.dp)
+        ) {
+
+            Image(painter = painterResource(
+                R.drawable.feijoada_completa_tradicional
+            ),
+                contentDescription = "Feijoada completa Tradicional",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            // IDENTIFICAÇÃO DO PRIMEIRO LUGAR
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(12.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xfffff4cc))
+                    .border(
+                        width = 1.5.dp,
+                        color = Color(0xffffc928),
+                        shape = CircleShape
+                    )
+                    .padding(
+                        horizontal = 12.dp,
+                        vertical = 6.dp
+                    )
+            ) {
+
+                Text(
+                    text = "#1 LUGAR · CAMPEÃ DA SEMANA",
+                    color = Color(0xff94501c),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        // INFORMAÇÕES DA RECEITA
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp)
+        ) {
+
+            // AUTOR
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Box(modifier = Modifier
+                    .size(32.dp)
+                    .background(
+                        Color(0xfffff1c2),
+                        CircleShape
+                    ),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Text(
+                        text = "CF",
+                        color = Color(0xff94501c),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Text(
+                    text = "por Carlos Ferreira",
+                    color = CinzaHome,
+                    fontSize = 13.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // NOME DA RECEITA
+
+            Text(
+                text = "Feijoada Completa Tradicional",
+                color = MarromHome,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                lineHeight = 22.sp,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(7.dp))
+
+            // DESCRIÇÃO
+
+            Text(
+                text = "O prato brasileiro mais famoso, preparado lentamente com carnes selecionadas e temperos especiais.",
+                color = CinzaHome,
+                fontSize = 13.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // TEMPO E DIFICULDADE
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Text(
+                    text = "◷",
+                    color = CinzaHome,
+                    fontSize = 17.sp
+                )
+
+                Text(
+                    text = "180 min",
+                    color = CinzaHome,
+                    fontSize = 13.sp
+                )
+
+                Spacer(modifier = Modifier.width(5.dp))
+
+                Text(
+                    text = "▥",
+                    color = CinzaHome,
+                    fontSize = 17.sp
+                )
+
+                Text(
+                    text = "Médio",
+                    color = CinzaHome,
+                    fontSize = 13.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // BOTÃO VER RECEITA
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(VerdeHome)
+                    .clickable {
+                        // Navegação para a receita será implementada depois.
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+
+                Text(
+                    text = "Ver Receita Completa",
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun ReceitaRankingCompactaHome(
+    imagem: Int,
+    posicao: String,
+    nome: String,
+    tempo: String,
+    dificuldade: String
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+            .border(
+                width = 1.5.dp,
+                color = BordaHome,
+                shape = RoundedCornerShape(20.dp)
+            )
+    ) {
+
+        // IMAGEM E POSIÇÃO NO RANKING
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+        ) {
+
+            Image(
+                painter = painterResource(imagem),
+                contentDescription = nome,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(10.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .padding(
+                        horizontal = 12.dp,
+                        vertical = 5.dp
+                    )
+            ) {
+
+                Text(
+                    text = posicao,
+                    color = CinzaHome,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        // INFORMAÇÕES
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 12.dp,
+                    vertical = 11.dp
+                )
+        ) {
+
+            Text(
+                text = nome,
+                color = MarromHome,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                lineHeight = 19.sp,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Text(
+                    text = tempo,
+                    color = CinzaHome,
+                    fontSize = 12.sp
+                )
+
+                Text(
+                    text = "·",
+                    color = CinzaHome,
+                    fontSize = 12.sp
+                )
+
+                Text(
+                    text = dificuldade,
+                    color = CinzaHome,
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun ReceitaPopularCardHome(
