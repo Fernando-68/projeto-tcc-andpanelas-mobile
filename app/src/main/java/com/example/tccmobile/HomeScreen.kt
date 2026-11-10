@@ -1,5 +1,7 @@
 package com.example.tccmobile
 
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,6 +49,11 @@ private val BordaHome = Color(0xFFEDE2D0)
 
 @Composable
 fun HomeScreen() {
+
+    val abaSelecionada = remember {
+        mutableStateOf("Para você")
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,7 +78,7 @@ fun HomeScreen() {
 
             // CATEGORIAS
 
-           CategoriasHome()
+            CategoriasHome()
 
             Spacer(modifier = Modifier.height(38.dp))
 
@@ -83,26 +90,47 @@ fun HomeScreen() {
 
             // ABAS DE RECEITAS
 
-            AbasHome()
+            AbasHome(
+                abaSelecionada = abaSelecionada.value,
+                onAbaSelecionada = { novaAba ->
+                    abaSelecionada.value = novaAba
+                }
+            )
 
-            Spacer(modifier = Modifier.height(34.dp))
+            when (abaSelecionada.value) {
 
-            // RECEITA DO DIA
+                "Seguindo" -> {
 
-            ReceitaDoDiaHome()
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(28.dp))
+                    ReceitaSeguindoHome()
+                }
 
-            // RECEITAS RÁPIDAS
+                "Populares" -> {
 
-            ReceitasRapidasHome()
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    ReceitasPopularesHome()
+                }
+
+                else -> {
+
+                    Spacer(modifier = Modifier.height(34.dp))
+
+                    ReceitaDoDiaHome()
+
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    ReceitasRapidasHome()
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            // NAVEGAÇÃO INFERIOR FIXA
+
+            NavegacaoInferiorHome()
         }
-
-        // NAVEGAÇÃO INFERIOR FIXA
-
-        NavegacaoInferiorHome()
     }
 }
 
@@ -339,7 +367,10 @@ private fun PerfilItem(
 // ABAS DE RECEITAS
 
 @Composable
-private fun AbasHome() {
+private fun AbasHome(
+    abaSelecionada: String,
+    onAbaSelecionada: (String) -> Unit
+) {
 
     Row(
         modifier = Modifier
@@ -350,20 +381,35 @@ private fun AbasHome() {
     ) {
 
         AbaHome(
-           texto = "Para você",
-            selecionada = true
+            texto = "Para você",
+            selecionada = abaSelecionada == "Para você",
+            onClick = {
+                onAbaSelecionada("Para você")
+            }
         )
 
         AbaHome(
             texto = "Seguindo",
+            selecionada = abaSelecionada == "Seguindo",
+            onClick = {
+                onAbaSelecionada("Seguindo")
+            }
         )
 
         AbaHome(
-            texto = "Populares"
+            texto = "Populares",
+            selecionada = abaSelecionada == "Populares",
+            onClick = {
+                onAbaSelecionada("Populares")
+            }
         )
 
         AbaHome(
-            texto = "Receitas"
+            texto = "Receitas da semana",
+            selecionada = abaSelecionada == "Receitas da semana",
+            onClick = {
+                onAbaSelecionada("Receitas da semana")
+            }
         )
     }
 }
@@ -371,8 +417,10 @@ private fun AbasHome() {
 @Composable
 private fun AbaHome(
     texto: String,
-    selecionada: Boolean = false
+    selecionada: Boolean = false,
+    onClick: () -> Unit
 ) {
+
     Box(
         modifier = Modifier
             .height(46.dp)
@@ -383,8 +431,11 @@ private fun AbaHome(
             .border(
                 width = if (selecionada) 0.dp else 1.5.dp,
                 color = BordaHome,
-                CircleShape
+                shape = CircleShape
             )
+            .clickable {
+                onClick()
+            }
             .padding(horizontal = 25.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -397,6 +448,336 @@ private fun AbaHome(
         )
     }
 }
+
+// RECEITA DA ABA SEGUINDO
+
+
+@Composable
+private fun ReceitaSeguindoHome() {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 28.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .background(Color.White)
+            .border(
+                width = 1.5.dp,
+                color = BordaHome,
+                shape = RoundedCornerShape(22.dp)
+            )
+    ) {
+
+        // IMAGEM E ELEMENTOS SOBREPOSTOS
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(230.dp)
+        ) {
+
+            // IMAGEM DA RECEITA
+
+            Image(
+                painter = painterResource(
+                    R.drawable.frango_ao_limao_siciliano
+                ),
+                contentDescription = "Frango ao Limão Siciliano",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            // CATEGORIA DA RECEITA
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(12.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(VerdeHome)
+                    .padding(
+                        horizontal = 12.dp,
+                        vertical = 6.dp
+                    )
+            ) {
+
+                Text(
+                    text = "ALMOÇO",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            // AUTOR DA RECEITA
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(7.dp)
+            ) {
+
+                // INICIAIS DO AUTOR
+
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .background(
+                            VerdeHome,
+                            CircleShape
+                        )
+                        .border(
+                            1.5.dp,
+                            Color.White,
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Text(
+                        text = "AC",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                // NOME DO AUTOR
+
+                Text(
+                    text = "Ana Costa",
+                    color = Color.White,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        // INFORMAÇÕES DA RECEITA
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 12.dp,
+                    vertical = 12.dp
+                )
+        ) {
+
+            Text(
+                text = "Frango ao Limão Siciliano",
+                color = MarromHome,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Text(
+                    text = "◷",
+                    color = VerdeHome,
+                    fontSize = 19.sp
+                )
+
+                Text(
+                    text = "40 min",
+                    color = CinzaHome,
+                    fontSize = 14.sp
+                )
+
+                Text(
+                    text = "♨",
+                    color = VerdeHome,
+                    fontSize = 17.sp
+                )
+
+                Text(
+                    text = "Fácil",
+                    color = CinzaHome,
+                    fontSize = 14.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReceitasPopularesHome() {
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        // TÍTULO E VER TODAS
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 28.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            Text(
+                text = "Populares da Semana",
+                color = MarromHome,
+                fontFamily = PlayfairDisplay,
+                fontSize = 23.sp,
+                modifier = Modifier.clickable {
+                    // Navegação será implementada posteriormente.
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(22.dp))
+
+        // PRIMEIRA LINHA DE RECEITAS
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 28.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+
+            ReceitaPopularCardHome(
+                modifier = Modifier.weight(1f),
+                imagem = R.drawable.frango_ao_limao,
+                nome = "Frango ao Limão",
+                tempo = "30 min",
+                porcoes = "2 porções"
+            )
+
+            ReceitaPopularCardHome(
+                modifier = Modifier.weight(1f),
+                imagem = R.drawable.sopa_de_abobora,
+                nome = "Sopa de Abóbora",
+                tempo = "40 min",
+                porcoes = "4 porções"
+            )
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // SEGUNDA LINHA DE RECEITAS
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 28.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+
+            ReceitaPopularCardHome(
+                modifier = Modifier.weight(1f),
+                imagem = R.drawable.pesto_de_manjericao,
+                nome = "Macarrão ao Pesto",
+                tempo = "15 min",
+                porcoes = "2 porções"
+            )
+
+            ReceitaPopularCardHome(
+                modifier = Modifier.weight(1f),
+                imagem = R.drawable.pao_de_queijo,
+                nome = "Pão de Queijo",
+                tempo = "25 min",
+                porcoes = "12 unidades"
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReceitaPopularCardHome(
+    modifier: Modifier = Modifier,
+    imagem: Int,
+    nome: String,
+    tempo: String,
+    porcoes: String
+) {
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+            .border(
+                width = 1.5.dp,
+                color = BordaHome,
+                shape = RoundedCornerShape(20.dp)
+            )
+    ) {
+
+        // IMAGEM
+
+        Image(
+            painter = painterResource(imagem),
+            contentDescription = nome,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(115.dp),
+            contentScale = ContentScale.Crop
+        )
+
+        // INFORMAÇÕES
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 10.dp,
+                    vertical = 9.dp
+                )
+        ) {
+            Text(
+                text = nome,
+                color = MarromHome,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                lineHeight = 19.sp,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Text(
+                    text = tempo,
+                    color = CinzaHome,
+                    fontSize = 12.sp
+                )
+
+                Text(
+                    text = ".",
+                    color = CinzaHome,
+                    fontSize = 12.sp
+                )
+
+                Text(
+                    text = porcoes,
+                    color = CinzaHome,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
 
 // RECEITA DO DIA
 
@@ -522,7 +903,7 @@ private fun ReceitasRapidasHome() {
 
             ReceitaCardHome(
                 imagem = R.drawable.pesto_de_manjericao,
-                nome = "Pesto de Manjericão",
+                nome = "Macarrão ao Pesto",
                 tempo = "15 min"
             )
         }
