@@ -239,7 +239,20 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(Routes.HOME) {
-                        HomeScreen()
+                        HomeScreen(
+                            onAbrirDetalheReceita = {
+                                navController.navigate(Routes.DETALHE_RECEITA)
+                            }
+                        )
+                    }
+
+                    composable (Routes.DETALHE_RECEITA) {
+
+                        DetalheReceitaScreen(
+                            onVoltar = {
+                                navController.popBackStack()
+                            }
+                        )
                     }
                 }
             }

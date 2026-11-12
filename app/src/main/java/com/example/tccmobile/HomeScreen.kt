@@ -40,6 +40,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tccmobile.ui.theme.PlayfairDisplay
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.draw.shadow
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import com.example.tccmobile.navigation.Routes
 
 private val FundoHome = Color(0xFFFFFCF8)
 private val MarromHome = Color(0xFF38251A)
@@ -48,10 +54,24 @@ private val VerdeHome = Color(0xFF72C5A8)
 private val BordaHome = Color(0xFFEDE2D0)
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onAbrirDetalheReceita: () -> Unit
+) {
 
     val abaSelecionada = remember {
         mutableStateOf("Para você")
+    }
+
+    val pesquisaAberta = remember {
+        mutableStateOf(false)
+    }
+
+    val textoPesquisa = remember {
+        mutableStateOf("")
+    }
+
+    val usuariosSeguidos = remember {
+        mutableStateOf(setOf("anabeatriz", "rafa.souza"))
     }
 
     Column(
@@ -84,7 +104,45 @@ fun HomeScreen() {
 
             // PERFIS
 
-            PerfisHome()
+            PerfisHome(
+                onPesquisaClick = {
+                    pesquisaAberta.value = true
+                    textoPesquisa.value = ""
+                }
+            )
+
+            // PESQUISA DE USUÁRIOS
+
+            if (pesquisaAberta.value) {
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                PainelPesquisaUsuariosHome(
+                    textoPesquisa = textoPesquisa.value,
+                    onTextoPesquisaChange = {
+                        textoPesquisa.value = it
+                    },
+
+                    usuariosSeguidos = usuariosSeguidos.value,
+                    onAlternarSeguir = { usuario ->
+
+                        usuariosSeguidos.value =
+                            if (usuario in usuariosSeguidos.value) {
+                                usuariosSeguidos.value - usuario
+                            }else {
+                                usuariosSeguidos.value + usuario
+                            }
+                    },
+                    onFechar = {
+                        pesquisaAberta.value = false
+                        textoPesquisa.value = ""
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+            } else {
+                Spacer(modifier = Modifier.height(30.dp))
+            }
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -103,7 +161,10 @@ fun HomeScreen() {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    ReceitaSeguindoHome()
+                    ReceitaSeguindoHome(
+
+                       onAbrirReceita = onAbrirDetalheReceita
+                    )
                 }
 
                 "Populares" -> {
@@ -134,10 +195,10 @@ fun HomeScreen() {
 
             Spacer(modifier = Modifier.height(24.dp))
 
+        }
             // NAVEGAÇÃO INFERIOR FIXA
 
             NavegacaoInferiorHome()
-        }
     }
 }
 
@@ -164,15 +225,8 @@ private fun CabecalhoHome() {
         )
 
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(18.dp)
+            verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Image(
-                painter = painterResource(R.drawable.lupa),
-                contentDescription = "Pesquisar",
-                modifier = Modifier.size(28.dp)
-            )
 
             Box(
                 modifier = Modifier
@@ -189,7 +243,7 @@ private fun CabecalhoHome() {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "AC",
+                    text = "AR",
                     color = VerdeHome,
                     fontSize = 17.sp,
                     fontWeight = FontWeight.SemiBold
@@ -278,7 +332,9 @@ private fun CategoriaItem(
 // PERFIS / STORIES
 
 @Composable
-private fun PerfisHome() {
+private fun PerfisHome(
+    onPesquisaClick: () -> Unit
+) {
 
     Row(
         modifier = Modifier
@@ -287,13 +343,6 @@ private fun PerfisHome() {
             .padding(horizontal = 24.dp),
         horizontalArrangement = Arrangement.spacedBy(22.dp)
     ) {
-
-        PerfilItem(
-            nome = "Pesquisa",
-            iniciais = "",
-            cor = Color.Transparent,
-            pesquisa = true
-        )
 
         PerfilItem(
             nome = "Ana",
@@ -326,7 +375,8 @@ private fun PerfilItem(
     nome: String,
     iniciais: String,
     cor: Color,
-    pesquisa: Boolean = false
+    pesquisa: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -342,6 +392,15 @@ private fun PerfilItem(
                             .padding(5.dp)
                     } else {
                         Modifier.background(cor, CircleShape)
+                    }
+                )
+                .then(
+                    if (pesquisa) {
+                        Modifier.clickable {
+                            onClick()
+                        }
+                    } else {
+                        Modifier
                     }
                 ),
             contentAlignment = Alignment.Center
@@ -460,12 +519,15 @@ private fun AbaHome(
 
 
 @Composable
-private fun ReceitaSeguindoHome() {
+private fun ReceitaSeguindoHome(
+    onAbrirReceita: () -> Unit
+) {
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 28.dp)
+            .clickable { onAbrirReceita() }
             .clip(RoundedCornerShape(22.dp))
             .background(Color.White)
             .border(
@@ -735,6 +797,7 @@ private fun ReceitasDaSemanaHome() {
         ReceitaRankingCompactaHome(
             imagem = R.drawable.moqueca_baiana,
             posicao = "#2 LUGAR · PRATA",
+            corPosicao = Color(0xffb0b0b0),
             nome = "Moqueca Baiana Aromática",
             tempo = "50 min",
             dificuldade = "Médio"
@@ -747,6 +810,7 @@ private fun ReceitasDaSemanaHome() {
         ReceitaRankingCompactaHome(
             imagem = R.drawable.picanha_na_brasa_com_alho,
             posicao = "#3 LUGAR · BRONZE",
+            corPosicao = Color(0xffcd7f32),
             nome = "Picanha na Brasa com Alho",
             tempo = "35 min",
             dificuldade = "Fácil"
@@ -946,6 +1010,7 @@ private fun ReceitaCampeaHome() {
 private fun ReceitaRankingCompactaHome(
     imagem: Int,
     posicao: String,
+    corPosicao: Color,
     nome: String,
     tempo: String,
     dificuldade: String
@@ -992,7 +1057,7 @@ private fun ReceitaRankingCompactaHome(
 
                 Text(
                     text = posicao,
-                    color = CinzaHome,
+                    color = corPosicao,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -1332,7 +1397,7 @@ private fun ReceitaCardHome(
 
 
 @Composable
-private fun NavegacaoInferiorHome() {
+fun NavegacaoInferiorHome() {
 
     Column(
         modifier = Modifier
@@ -1468,5 +1533,320 @@ private fun ItemNavegacaoHome(
                 FontWeight.Normal
             }
         )
+    }
+}
+
+private data class UsuarioPesquisaHome(
+    val nome: String,
+    val usuario: String,
+    val iniciais: String,
+    val cor: Color
+)
+
+private val usuariosDisponiveisHome = listOf(
+
+    UsuarioPesquisaHome(
+        nome = "Ana Beatriz",
+        usuario = "anabeatriz",
+        iniciais = "AB",
+        cor = Color(0xFF82CDBB)
+    ),
+
+    UsuarioPesquisaHome(
+        nome = "Carlos Eduardo",
+        usuario = "cadu.cozinha",
+        iniciais = "CE",
+        cor = Color(0xFF6D1D32)
+    ),
+
+    UsuarioPesquisaHome(
+        nome = "Mariana Lopes",
+        usuario = "marilopes",
+        iniciais = "ML",
+        cor = Color(0xFF82CDBB)
+    ),
+
+    UsuarioPesquisaHome(
+        nome = "Rafael Souza",
+        usuario = "rafa.souza",
+        iniciais = "RS",
+        cor = Color(0xFF6D1D32)
+    )
+)
+
+@Composable
+private fun PainelPesquisaUsuariosHome(
+    textoPesquisa: String,
+    onTextoPesquisaChange: (String) -> Unit,
+    usuariosSeguidos: Set<String>,
+    onAlternarSeguir: (String) -> Unit,
+    onFechar: () -> Unit
+) {
+
+    val usuariosFiltrados = usuariosDisponiveisHome.filter { usuario ->
+
+        usuario.nome.contains(textoPesquisa, ignoreCase = true) ||
+                usuario.usuario.contains(textoPesquisa, ignoreCase = true)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .shadow(
+                elevation = 5.dp,
+                shape = RoundedCornerShape(28.dp)
+            )
+            .clip(RoundedCornerShape(28.dp))
+            .background(Color(0xFFF7EFDF))
+            .padding(
+                horizontal = 20.dp,
+                vertical = 24.dp
+            )
+    ) {
+
+        // TÍTULO E BOTÃO FECHAR
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            Text(
+                text = "Buscar pessoas",
+                color = Color(0xFF6D1D32),
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFECE0C9))
+                    .clickable {
+                        onFechar()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Fechar pesquisa",
+                    tint = Color(0xFF6D1D32),
+                    modifier = Modifier.size(25.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // CAMPO DE PESQUISA
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .border(
+                    width = 1.5.dp,
+                    color = Color(0xFFE5D7BD),
+                    shape = CircleShape
+                )
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Image(
+                painter = painterResource(R.drawable.lupa),
+                contentDescription = "Pesquisar",
+                modifier = Modifier.size(23.dp)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            BasicTextField(
+                value = textoPesquisa,
+                onValueChange = onTextoPesquisaChange,
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    color = Color(0xFF6D1D32),
+                    fontSize = 15.sp
+                ),
+                decorationBox = { campoInterno ->
+
+                    Box {
+
+                        if (textoPesquisa.isEmpty()) {
+
+                            Text(
+                                text = "Buscar por nome ou @usuário",
+                                color = Color(0xFF9A817B),
+                                fontSize = 15.sp
+                            )
+                        }
+
+                        campoInterno()
+                    }
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // RESULTADOS DA PESQUISA
+
+        if (usuariosFiltrados.isEmpty()) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 30.dp),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Text(
+                    text = "Nenhuma pessoa encontrada.",
+                    color = Color(0xFF9A817B),
+                    fontSize = 14.sp
+                )
+            }
+
+        } else {
+
+            usuariosFiltrados.forEachIndexed { indice, usuario ->
+
+                UsuarioPesquisaItemHome(
+                    usuario = usuario,
+                    seguindo = usuario.usuario in usuariosSeguidos,
+                    onAlternarSeguir = {
+                        onAlternarSeguir(usuario.usuario)
+                    }
+                )
+
+                if (indice != usuariosFiltrados.lastIndex) {
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(Color(0xFFE5D7BD))
+                    )
+
+                    Spacer(modifier = Modifier.height(15.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UsuarioPesquisaItemHome(
+    usuario: UsuarioPesquisaHome,
+    seguindo: Boolean,
+    onAlternarSeguir: () -> Unit
+) {
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+
+        // FOTO OU INICIAIS
+
+        Box(
+            modifier = Modifier
+                .size(54.dp)
+                .background(
+                    color = usuario.cor,
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+
+            Text(
+                text = usuario.iniciais,
+                color = if (usuario.cor == Color(0xFF82CDBB)) {
+                    Color(0xFF6D1D32)
+                } else {
+                    Color.White
+                },
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        // NOME E @USUÁRIO
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+
+            Text(
+                text = usuario.nome,
+                color = Color(0xFF6D1D32),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(3.dp))
+
+            Text(
+                text = "@${usuario.usuario}",
+                color = Color(0xFF9A817B),
+                fontSize = 12.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        // BOTÃO SEGUIR / DEIXAR DE SEGUIR
+
+        Box(
+            modifier = Modifier
+                .width(116.dp)
+                .height(42.dp)
+                .clip(CircleShape)
+                .then(
+                    if (seguindo) {
+                        Modifier.border(
+                            width = 1.5.dp,
+                            color = Color(0xFF6D1D32),
+                            shape = CircleShape
+                        )
+                    } else {
+                        Modifier.background(Color(0xFF6D1D32))
+                    }
+                )
+                .clickable {
+                    onAlternarSeguir()
+                },
+            contentAlignment = Alignment.Center
+        ) {
+
+            Text(
+                text = if (seguindo) {
+                    "Deixar de seguir"
+                } else {
+                    "Seguir"
+                },
+                color = if (seguindo) {
+                    Color(0xFF6D1D32)
+                } else {
+                    Color.White
+                },
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
+        }
     }
 }

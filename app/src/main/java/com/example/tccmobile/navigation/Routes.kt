@@ -13,5 +13,7 @@ object Routes {
     const val HOME = "home"
 
     const val TERMOS_PRIVACIDADE = "termos-privacidade"
+
+    const val DETALHE_RECEITA = "detalhe-reeita"
 }
 
