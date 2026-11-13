@@ -1,9 +1,6 @@
 
 package com.example.tccmobile
 
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,12 +23,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.example.tccmobile.ui.theme.PlayfairDisplay
-import android.util.Log
-import android.webkit.CookieManager
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Path
 
 private val FundoDetalhe = Color(0xFFFFFCF8)
 private val MarromDetalhe = Color(0xFF38251A)
@@ -112,7 +108,8 @@ fun DetalheReceitaScreen(
                     Text(
                         text = "‹",
                         color = MarromDetalhe,
-                        fontSize = 34.sp
+                        fontSize = 34.sp,
+                        modifier = Modifier.offset(y = (-3).dp)
                     )
                 }
 
@@ -406,13 +403,19 @@ fun DetalheReceitaScreen(
                         "Sirva acompanhado de arroz ou legumes."
                     )
 
-                    etapas.forEachIndexed { indice, etapa ->
-                        EtapaPreparoReceita(
-                            numero = indice + 1,
-                            texto = etapa
-                        )
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        etapas.forEachIndexed { indice, etapa ->
+                            CardPassoPreparo(
+                                numero = indice + 1,
+                                descricao = etapa
+                            )
+                        }
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -741,11 +744,24 @@ private fun ComentarioReceita(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "✎     ▤",
-                color = VerdeDetalhe,
-                fontSize = 17.sp
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // ÍCONE EDITAR
+                Image(
+                    painter = painterResource(R.drawable.lapis_editar),
+                    contentDescription = "Editar comentário",
+                    modifier = Modifier.size(18.dp)
+                )
+
+                // ÍCONE EXCLUIR
+                Image(
+                    painter = painterResource(R.drawable.excluir),
+                    contentDescription = "Excluir comentário",
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
 }
@@ -753,112 +769,142 @@ private fun ComentarioReceita(
 // PLAYER DO YOUTUBE
 
 
+
 @Composable
 private fun VideoReceita() {
 
     val contexto = LocalContext.current
 
-    AndroidView(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(190.dp)
-            .clip(RoundedCornerShape(13.dp)),
+            .clip(RoundedCornerShape(13.dp))
+            .clickable {
 
-        factory = {
+                val enderecoVideo =
+                    "https://www.youtube.com/watch?v=9zPc5lVEIQA"
 
-            WebView(contexto).apply {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(enderecoVideo)
+                )
 
-                // CONFIGURAÇÃO DO PLAYER
+                contexto.startActivity(intent)
+            }
+    ) {
 
-                setBackgroundColor(android.graphics.Color.BLACK)
+        // IMAGEM DE CAPA
 
-                webViewClient = object : WebViewClient() {
+        Image(
+            painter = painterResource(
+                R.drawable.frango_ao_limao_siciliano
+            ),
+            contentDescription = "Assistir vídeo da receita",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
-                    override fun onReceivedError(
-                        view: WebView,
-                        request: WebResourceRequest,
-                        error: WebResourceError
-                    ) {
-                        super.onReceivedError(view, request, error)
+        // SOBREPOSIÇÃO ESCURA
 
-                        Log.e(
-                            "VideoReceita",
-                            "Erro ao carregar: ${error.description}"
-                        )
-                    }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Color.Black.copy(alpha = 0.30f)
+                )
+        )
+
+        // BOTÃO DE REPRODUÇÃO
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(62.dp)
+                .background(
+                    VerdeDetalhe,
+                    CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+
+            Canvas(
+                modifier = Modifier
+                    .size(25.dp)
+            ) {
+                val caminho = Path().apply {
+                    moveTo(size.width * 0.20f, 0f)
+                    lineTo(size.width * 0.20f, size.height)
+                    lineTo(size.width, size.height / 2f)
+                    close()
                 }
 
-                webChromeClient = WebChromeClient()
-
-                settings.javaScriptEnabled = true
-                settings.domStorageEnabled = true
-                settings.loadsImagesAutomatically = true
-                settings.mediaPlaybackRequiresUserGesture = true
-
-                // PERMISSÃO PARA COOKIES DE TERCEIROS
-
-                CookieManager.getInstance()
-                    .setAcceptThirdPartyCookies(this, true)
-
-                // CARREGAMENTO DO VÍDEO
-
-                val html = """
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <meta name="viewport"
-                              content="width=device-width,
-                              initial-scale=1.0">
-
-                        <style>
-                            html, body {
-                                margin: 0;
-                                padding: 0;
-                                width: 100%;
-                                height: 100%;
-                                background: #000;
-                                overflow: hidden;
-                            }
-
-                            iframe {
-                                width: 100%;
-                                height: 100%;
-                                border: 0;
-                            }
-                        </style>
-                    </head>
-
-                    <body>
-
-                        <iframe
-                            src="https://www.youtube-nocookie.com/embed/9zPc5lVEIQA?playsinline=1&rel=0"
-                            title="Frango ao Limão Siciliano"
-                            allow="accelerometer;
-                                   autoplay;
-                                   clipboard-write;
-                                   encrypted-media;
-                                   gyroscope;
-                                   picture-in-picture;
-                                   web-share"
-                            allowfullscreen>
-                        </iframe>
-
-                    </body>
-                    </html>
-                """.trimIndent()
-
-                loadDataWithBaseURL(
-                    "https://www.youtube-nocookie.com",
-                    html,
-                    "text/html",
-                    "UTF-8",
-                    null
+                drawPath(
+                    path = caminho,
+                    color = Color.White
                 )
             }
-        },
-
-        update = {
-            // Mantém o player durante as recomposições.
         }
-    )
+
+        // INDICAÇÃO
+
+        Text(
+            text = "Assistir no YouTube",
+            color = Color.White,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 12.dp)
+        )
+    }
+}
+
+@Composable
+private fun CardPassoPreparo(
+    numero: Int,
+    descricao: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.5.dp,
+                color = Color(0xFFE8DCC9),
+                shape = RoundedCornerShape(13.dp)
+            )
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(13.dp)
+            )
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .background(
+                    color = VerdeDetalhe,
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = numero.toString(),
+                color = Color.White,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Text(
+            text = descricao,
+            color = Color(0xFF38251A),
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+            modifier = Modifier.weight(1f)
+        )
+    }
 }
