@@ -28,6 +28,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 private val FundoDetalhe = Color(0xFFFFFCF8)
 private val MarromDetalhe = Color(0xFF38251A)
@@ -57,6 +59,22 @@ fun DetalheReceitaScreen(
     }
 
     var comentario by remember {
+        mutableStateOf("")
+    }
+
+    var mostrarDialogoDenuncia by remember {
+        mutableStateOf(false)
+    }
+
+    var denunciaEnviada by remember {
+        mutableStateOf(false)
+    }
+
+    var motivoDenuncia by remember {
+        mutableStateOf("Conteúdo impróprio ou ofensivo")
+    }
+
+    var detalhesDenuncia by remember {
         mutableStateOf("")
     }
 
@@ -212,7 +230,8 @@ fun DetalheReceitaScreen(
                         color = CinzaDetalhe,
                         fontSize = 11.sp,
                         modifier = Modifier.clickable {
-                            // Ação de denúncia será integrada posteriormente.
+                            mostrarDialogoDenuncia = true
+                            denunciaEnviada = false
                         }
                     )
                 }
@@ -479,6 +498,24 @@ fun DetalheReceitaScreen(
         // NAVEGAÇÃO INFERIOR FIXA
 
         NavegacaoInferiorHome()
+    }
+
+    if (mostrarDialogoDenuncia) {
+        DialogoDenuncia(
+            motivo = motivoDenuncia,
+            onMotivoChange = { motivoDenuncia = it },
+            detalhes = detalhesDenuncia,
+            onDetalhesChange = { detalhesDenuncia = it },
+            enviado = denunciaEnviada,
+            onEnviar = {
+                denunciaEnviada = true
+            },
+            onFechar = {
+                mostrarDialogoDenuncia = false
+                detalhesDenuncia = ""
+                motivoDenuncia = "Conteúdo impróprio ou ofensivo"
+            }
+        )
     }
 }
 
@@ -906,5 +943,294 @@ private fun CardPassoPreparo(
             lineHeight = 24.sp,
             modifier = Modifier.weight(1f)
         )
+    }
+}
+
+
+@Composable
+private fun DialogoDenuncia(
+    motivo: String,
+    onMotivoChange: (String) -> Unit,
+    detalhes: String,
+    onDetalhesChange: (String) -> Unit,
+    enviado: Boolean,
+    onEnviar: () -> Unit,
+    onFechar: () -> Unit
+) {
+    val motivos = listOf(
+        "Conteúdo impróprio ou ofensivo",
+        "Spam ou propaganda indesejada",
+        "Não tem relação com culinária",
+        "Violação de direitos autorais",
+        "Outro motivo"
+    )
+
+    Dialog(
+        onDismissRequest = onFechar,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(0.90f)
+                .clip(RoundedCornerShape(18.dp))
+                .background(Color.White)
+                .border(
+                    1.dp,
+                    BordaDetalhe,
+                    RoundedCornerShape(18.dp)
+                )
+                .padding(18.dp)
+        ) {
+
+            // CABEÇALHO
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (enviado) "Denúncia enviada" else "Denunciar Publicação",
+                    color = MarromDetalhe,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(FundoDetalhe)
+                        .clickable { onFechar() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "×",
+                        color = CinzaDetalhe,
+                        fontSize = 22.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (enviado) {
+
+                // CONFIRMAÇÃO DE ENVIO
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(66.dp)
+                            .background(
+                                Color(0xFFE5F4EE),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "✓",
+                            color = VerdeDetalhe,
+                            fontSize = 34.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Denúncia Enviada!",
+                        color = MarromDetalhe,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = "Obrigado por nos ajudar a manter a comunidade do Panelas limpa e segura para todos. Analisaremos seu reporte em breve.",
+                        color = CinzaDetalhe,
+                        fontSize = 14.sp,
+                        lineHeight = 21.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(VerdeDetalhe)
+                            .clickable { onFechar() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Entendi",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+
+            } else {
+
+                // FORMULÁRIO DE DENÚNCIA
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 440.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = "QUAL O MOTIVO DA DENÚNCIA?",
+                        color = CinzaDetalhe,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    motivos.forEach { opcao ->
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onMotivoChange(opcao)
+                                }
+                                .padding(vertical = 7.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(21.dp)
+                                    .border(
+                                        width = 1.8.dp,
+                                        color = if (motivo == opcao)
+                                            VerdeDetalhe
+                                        else
+                                            BordaDetalhe,
+                                        shape = CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (motivo == opcao) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(10.dp)
+                                            .background(
+                                                VerdeDetalhe,
+                                                CircleShape
+                                            )
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(11.dp))
+
+                            Text(
+                                text = opcao,
+                                color = MarromDetalhe,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Detalhes adicionais (opcional)",
+                        color = CinzaDetalhe,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    androidx.compose.material3.OutlinedTextField(
+                        value = detalhes,
+                        onValueChange = onDetalhesChange,
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = {
+                            Text(
+                                "Escreva aqui mais informações sobre a denúncia...",
+                                fontSize = 12.sp,
+                                color = CinzaDetalhe
+                            )
+                        },
+                        minLines = 3,
+                        maxLines = 4,
+                        shape = RoundedCornerShape(10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Nossa equipe poderá analisar esta denúncia para garantir que as diretrizes da comunidade sejam mantidas.",
+                        color = CinzaDetalhe,
+                        fontSize = 11.sp,
+                        lineHeight = 16.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // BOTÕES
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(46.dp)
+                            .border(
+                                1.dp,
+                                BordaDetalhe,
+                                RoundedCornerShape(10.dp)
+                            )
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable { onFechar() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Cancelar",
+                            color = CinzaDetalhe,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(46.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFFD71930))
+                            .clickable { onEnviar() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Enviar denúncia",
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
+        }
     }
 }

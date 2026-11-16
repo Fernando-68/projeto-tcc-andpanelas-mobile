@@ -55,7 +55,8 @@ private val BordaHome = Color(0xFFEDE2D0)
 
 @Composable
 fun HomeScreen(
-    onAbrirDetalheReceita: () -> Unit
+    onAbrirDetalheReceita: () -> Unit,
+    onAbrirBusca: () -> Unit
 ) {
 
     val abaSelecionada = remember {
@@ -198,7 +199,10 @@ fun HomeScreen(
         }
             // NAVEGAÇÃO INFERIOR FIXA
 
-            NavegacaoInferiorHome()
+            NavegacaoInferiorHome(
+                telaSelecionada = "Início",
+                onBuscarClick = onAbrirBusca
+            )
     }
 }
 
@@ -1397,7 +1401,10 @@ private fun ReceitaCardHome(
 
 
 @Composable
-fun NavegacaoInferiorHome() {
+fun NavegacaoInferiorHome(
+    telaSelecionada: String = "Início",
+    onBuscarClick: () -> Unit = {}
+) {
 
     Column(
         modifier = Modifier
@@ -1437,7 +1444,7 @@ fun NavegacaoInferiorHome() {
                     ItemNavegacaoHome(
                         imagem = R.drawable.home,
                         texto = "Início",
-                        selecionado = true
+                        selecionado = telaSelecionada == "Início"
                     )
                 }
 
@@ -1449,7 +1456,9 @@ fun NavegacaoInferiorHome() {
                 ) {
                     ItemNavegacaoHome(
                         imagem = R.drawable.lupa,
-                        texto = "Buscar"
+                        texto = "Buscar",
+                        selecionado = telaSelecionada == "Buscar",
+                        onClick = onBuscarClick
                     )
                 }
 
@@ -1461,7 +1470,8 @@ fun NavegacaoInferiorHome() {
                 ) {
                     ItemNavegacaoHome(
                         imagem = R.drawable.users_alter,
-                        texto = "Comunidades"
+                        texto = "Comunidades",
+                        selecionado = telaSelecionada == "Comunidades"
                     )
                 }
 
@@ -1472,7 +1482,8 @@ fun NavegacaoInferiorHome() {
                 ) {
                     ItemNavegacaoHome(
                         imagem = R.drawable.geladeira,
-                        texto = "Geladeira"
+                        texto = "Geladeira",
+                        selecionado = telaSelecionada == "Geladeira"
                     )
                 }
             }
@@ -1508,9 +1519,13 @@ fun NavegacaoInferiorHome() {
 private fun ItemNavegacaoHome(
     imagem: Int,
     texto: String,
-    selecionado: Boolean = false
+    selecionado: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     Column(
+        modifier = Modifier.clickable {
+            onClick()
+        },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

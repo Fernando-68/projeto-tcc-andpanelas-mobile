@@ -242,6 +242,20 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(
                             onAbrirDetalheReceita = {
                                 navController.navigate(Routes.DETALHE_RECEITA)
+                            },
+                            onAbrirBusca = {
+                                navController.navigate(Routes.BUSCA)
+                            }
+                        )
+                    }
+
+                    composable(Routes.BUSCA) {
+                        BuscaScreen(
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+                            onAbrirDetalheReceita = {
+                                navController.navigate(Routes.DETALHE_RECEITA)
                             }
                         )
                     }
