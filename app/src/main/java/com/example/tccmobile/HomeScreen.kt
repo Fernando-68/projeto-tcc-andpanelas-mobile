@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.graphics.ColorFilter
 import com.example.tccmobile.navigation.Routes
 
 private val FundoHome = Color(0xFFFFFCF8)
@@ -63,26 +64,13 @@ fun HomeScreen(
         mutableStateOf("Para você")
     }
 
-    val pesquisaAberta = remember {
-        mutableStateOf(false)
-    }
-
-    val textoPesquisa = remember {
-        mutableStateOf("")
-    }
-
-    val usuariosSeguidos = remember {
-        mutableStateOf(setOf("anabeatriz", "rafa.souza"))
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(FundoHome)
-            .statusBarsPadding()
-            .navigationBarsPadding()
     ) {
-        // CABEÇALHO FIXO
+
+        //CABEÇALHO FIXO
 
         CabecalhoHome()
 
@@ -97,57 +85,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // CATEGORIAS
-
-            CategoriasHome()
-
-            Spacer(modifier = Modifier.height(38.dp))
-
-            // PERFIS
-
-            PerfisHome(
-                onPesquisaClick = {
-                    pesquisaAberta.value = true
-                    textoPesquisa.value = ""
-                }
-            )
-
-            // PESQUISA DE USUÁRIOS
-
-            if (pesquisaAberta.value) {
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                PainelPesquisaUsuariosHome(
-                    textoPesquisa = textoPesquisa.value,
-                    onTextoPesquisaChange = {
-                        textoPesquisa.value = it
-                    },
-
-                    usuariosSeguidos = usuariosSeguidos.value,
-                    onAlternarSeguir = { usuario ->
-
-                        usuariosSeguidos.value =
-                            if (usuario in usuariosSeguidos.value) {
-                                usuariosSeguidos.value - usuario
-                            }else {
-                                usuariosSeguidos.value + usuario
-                            }
-                    },
-                    onFechar = {
-                        pesquisaAberta.value = false
-                        textoPesquisa.value = ""
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-            } else {
-                Spacer(modifier = Modifier.height(30.dp))
-            }
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            // ABAS DE RECEITAS
+            // ABAS PRINCIPAIS DE RECEITAS
 
             AbasHome(
                 abaSelecionada = abaSelecionada.value,
@@ -156,6 +94,8 @@ fun HomeScreen(
                 }
             )
 
+            // CONTEÚDO DE CADA ABA
+
             when (abaSelecionada.value) {
 
                 "Seguindo" -> {
@@ -163,8 +103,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     ReceitaSeguindoHome(
-
-                       onAbrirReceita = onAbrirDetalheReceita
+                        onAbrirReceita = onAbrirDetalheReceita
                     )
                 }
 
@@ -195,16 +134,17 @@ fun HomeScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
         }
-            // NAVEGAÇÃO INFERIOR FIXA
 
-            NavegacaoInferiorHome(
-                telaSelecionada = "Início",
-                onBuscarClick = onAbrirBusca
-            )
+        // NAVEGAÇÃO INFERIOR FIXA
+
+        NavegacaoInferiorHome(
+            telaSelecionada = "Início",
+            onBuscarClick = onAbrirBusca
+        )
     }
 }
+
 
 // CABEÇALHO
 
@@ -1515,6 +1455,7 @@ fun NavegacaoInferiorHome(
 }
 
 
+
 @Composable
 private fun ItemNavegacaoHome(
     imagem: Int,
@@ -1529,14 +1470,22 @@ private fun ItemNavegacaoHome(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        // ÍCONE
+
         Image(
             painter = painterResource(imagem),
             contentDescription = texto,
             modifier = Modifier.size(20.dp),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Fit,
+            colorFilter = ColorFilter.tint(
+                if (selecionado) VerdeHome else CinzaHome
+            )
         )
 
         Spacer(modifier = Modifier.height(3.dp))
+
+        // TEXTO
 
         Text(
             text = texto,
@@ -1550,6 +1499,7 @@ private fun ItemNavegacaoHome(
         )
     }
 }
+
 
 private data class UsuarioPesquisaHome(
     val nome: String,
