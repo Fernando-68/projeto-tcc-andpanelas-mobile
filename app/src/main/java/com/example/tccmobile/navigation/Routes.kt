@@ -14,8 +14,12 @@ object Routes {
 
     const val TERMOS_PRIVACIDADE = "termos-privacidade"
 
-    const val DETALHE_RECEITA = "detalhe-reeita"
+    const val DETALHE_RECEITA = "detalhe-receita"
 
     const val BUSCA = "busca"
+
+    const val COMUNIDADES = "comunidades"
+
+    const val GELADEIRA = "geladeira"
 }
 

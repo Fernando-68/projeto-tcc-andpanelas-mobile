@@ -194,8 +194,10 @@ private val comunidadesDisponiveis = listOf(
 
 @Composable
 fun BuscaScreen(
-    onVoltar: () -> Unit,
-    onAbrirDetalheReceita: () -> Unit
+    onAbrirDetalheReceita: () -> Unit,
+    onAbrirInicio: () -> Unit,
+    onAbrirComunidades: () -> Unit,
+    onAbrirGeladeira: () -> Unit
 ) {
 
     var categoriaSelecionada by remember {
@@ -243,18 +245,9 @@ fun BuscaScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(66.dp)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 28.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Text(
-                text = "‹",
-                color = MarromBusca,
-                fontSize = 34.sp,
-                modifier = Modifier
-                    .clickable { onVoltar() }
-                    .padding(end = 20.dp)
-            )
 
             Column {
                 Text(
@@ -491,7 +484,11 @@ fun BuscaScreen(
         // NAVEGAÇÃO INFERIOR FIXA
 
         NavegacaoInferiorHome(
-            telaSelecionada = "Buscar"
+            telaSelecionada = "Buscar",
+            onInicioClick = onAbrirInicio,
+            onBuscarClick = {},
+            onComunidadesClick = onAbrirComunidades,
+            onGeladeiraClick = onAbrirGeladeira
         )
     }
 }
@@ -869,11 +866,12 @@ private fun ConteudoExplorarReceitasBusca(
                     .background(Color(0xFF3985F5)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "⬡",
-                    color = Color.White,
-                    fontSize = 27.sp,
-                    fontWeight = FontWeight.Bold
+                Image(
+                    painter = painterResource(R.drawable.box),
+                    contentDescription = "Ícone da geladeira",
+                    modifier = Modifier
+                        .size(25.dp),
+                    contentScale = ContentScale.Fit
                 )
             }
 
@@ -1455,11 +1453,12 @@ private fun IngredientesBusca(
                 contentAlignment = Alignment.Center
             ) {
 
-                Text(
-                    text = "⬡",
-                    color = Color.White,
-                    fontSize = 27.sp,
-                    fontWeight = FontWeight.Bold
+                Image(
+                    painter = painterResource(R.drawable.box),
+                    contentDescription = "Ícone da geladeira",
+                    modifier = Modifier
+                        .size(20.dp),
+                    contentScale = ContentScale.Fit
                 )
             }
 
@@ -1876,12 +1875,17 @@ private fun CartaoDicaChefinhoBusca(
 
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(42.dp)
                     .clip(CircleShape)
                     .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                Text("👨‍🍳", fontSize = 18.sp)
+                Image(
+                    painter = painterResource(R.drawable.chefinho),
+                    contentDescription = "Chefinho",
+                    modifier = Modifier.size(38.dp),
+                    contentScale = ContentScale.Fit
+                )
             }
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -2184,12 +2188,17 @@ private fun DicaChefinhoCompactaBusca() {
 
         Box(
             modifier = Modifier
-                .size(32.dp)
+                .size(42.dp)
                 .clip(CircleShape)
                 .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
-            Text("👨‍🍳", fontSize = 18.sp)
+            Image(
+                painter = painterResource(R.drawable.chefinho),
+                contentDescription = "Chefinho",
+                modifier = Modifier.size(38.dp),
+                contentScale = ContentScale.Fit
+            )
         }
 
         Spacer(modifier = Modifier.width(10.dp))
@@ -2231,10 +2240,12 @@ private fun CartaoGeladeiraBusca() {
                 .background(Color(0xFF3985F5)),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "⬢",
-                color = Color.White,
-                fontSize = 23.sp
+            Image(
+                painter = painterResource(R.drawable.box),
+                contentDescription = "Ícone da geladeira",
+                modifier = Modifier
+                    .size(20.dp),
+                contentScale = ContentScale.Fit
             )
         }
 

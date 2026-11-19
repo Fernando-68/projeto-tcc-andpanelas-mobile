@@ -63,8 +63,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.tccmobile.ui.theme.PlayfairDisplay
 import com.example.tccmobile.ui.theme.TCCMobileTheme
-import com.example.tccmobile.LoginScreen
-import com.example.tccmobile.CadastroScreen
 import com.example.tccmobile.navigation.Routes
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.rememberCoroutineScope
@@ -80,6 +78,21 @@ class MainActivity : ComponentActivity() {
             TCCMobileTheme {
 
                 val navController = rememberNavController()
+
+                // NAVEGAÇÃO ENTRE AS QUATRO ÁREAS PRINCIPAIS
+
+                fun navegarParaSecao(rota: String) {
+
+                    navController.navigate(rota) {
+
+                        popUpTo(Routes.HOME) {
+                            saveState = true
+                        }
+
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
 
                 NavHost(
                     navController = navController,
@@ -239,32 +252,87 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(Routes.HOME) {
+
                         HomeScreen(
                             onAbrirDetalheReceita = {
                                 navController.navigate(Routes.DETALHE_RECEITA)
                             },
                             onAbrirBusca = {
-                                navController.navigate(Routes.BUSCA)
+                                navegarParaSecao(Routes.BUSCA)
+                            },
+                            onAbrirComunidades = {
+                                navegarParaSecao(Routes.COMUNIDADES)
+                            },
+                            onAbrirGeladeira = {
+                                navegarParaSecao(Routes.GELADEIRA)
                             }
                         )
                     }
 
                     composable(Routes.BUSCA) {
+
                         BuscaScreen(
-                            onVoltar = {
-                                navController.popBackStack()
-                            },
                             onAbrirDetalheReceita = {
                                 navController.navigate(Routes.DETALHE_RECEITA)
+                            },
+                            onAbrirInicio = {
+                                navegarParaSecao(Routes.HOME)
+                            },
+                            onAbrirComunidades = {
+                                navegarParaSecao(Routes.COMUNIDADES)
+                            },
+                            onAbrirGeladeira = {
+                                navegarParaSecao(Routes.GELADEIRA)
                             }
                         )
                     }
 
-                    composable (Routes.DETALHE_RECEITA) {
+                    composable(Routes.COMUNIDADES) {
 
+                        ComunidadesScreen(
+                            onAbrirInicio = {
+                                navegarParaSecao(Routes.HOME)
+                            },
+                            onAbrirBusca = {
+                                navegarParaSecao(Routes.BUSCA)
+                            },
+                            onAbrirGeladeira = {
+                                navegarParaSecao(Routes.GELADEIRA)
+                            }
+                        )
+                    }
+
+                    composable(Routes.GELADEIRA) {
+
+                        GeladeiraScreen(
+                            onAbrirInicio = {
+                                navegarParaSecao(Routes.HOME)
+                            },
+                            onAbrirBusca = {
+                                navegarParaSecao(Routes.BUSCA)
+                            },
+                            onAbrirComunidades = {
+                                navegarParaSecao(Routes.COMUNIDADES)
+                            }
+                        )
+                    }
+
+                    composable(Routes.DETALHE_RECEITA) {
                         DetalheReceitaScreen(
                             onVoltar = {
                                 navController.popBackStack()
+                            },
+                            onInicioClick = {
+                                navegarParaSecao(Routes.HOME)
+                            },
+                            onBuscarClick = {
+                                navegarParaSecao(Routes.BUSCA)
+                            },
+                            onComunidadesClick = {
+                                navegarParaSecao(Routes.COMUNIDADES)
+                            },
+                            onGeladeiraClick = {
+                                navegarParaSecao(Routes.GELADEIRA)
                             }
                         )
                     }

@@ -39,7 +39,11 @@ private val BordaDetalhe = Color(0xFFEDE2D0)
 
 @Composable
 fun DetalheReceitaScreen(
-    onVoltar: () -> Unit
+    onVoltar: () -> Unit,
+    onInicioClick: () -> Unit,
+    onBuscarClick: () -> Unit,
+    onComunidadesClick: () -> Unit,
+    onGeladeiraClick: () -> Unit
 ) {
 
     var abaSelecionada by remember {
@@ -497,7 +501,13 @@ fun DetalheReceitaScreen(
 
         // NAVEGAÇÃO INFERIOR FIXA
 
-        NavegacaoInferiorHome()
+        NavegacaoInferiorHome(
+            telaSelecionada = "",
+            onInicioClick = onInicioClick,
+            onBuscarClick = onBuscarClick,
+            onComunidadesClick = onComunidadesClick,
+            onGeladeiraClick = onGeladeiraClick
+        )
     }
 
     if (mostrarDialogoDenuncia) {
