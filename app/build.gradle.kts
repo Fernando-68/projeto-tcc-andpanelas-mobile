@@ -20,6 +20,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "CLOUDINARY_CLOUD_NAME", "\"dpt5mm8x3\"")
+        buildConfigField("String", "CLOUDINARY_PRESET", "\"entre-panelas-4tech\"")
     }
 
     buildTypes {
@@ -37,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -72,6 +75,8 @@ dependencies {
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.9.8")
+    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
 
     // Testes
     testImplementation(libs.junit)

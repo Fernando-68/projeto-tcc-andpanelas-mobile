@@ -1,7 +1,5 @@
-package com.example.tccmobile
+package com.example.tccmobile.home
 
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,37 +14,40 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tccmobile.R
+import com.example.tccmobile.ui.components.ReceitaCard
+import com.example.tccmobile.ui.components.ReceitaMiniCard
 import com.example.tccmobile.ui.theme.PlayfairDisplay
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.ui.draw.shadow
-import androidx.compose.material3.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.ui.graphics.ColorFilter
-import com.example.tccmobile.navigation.Routes
 
 private val FundoHome = Color(0xFFFFFCF8)
 private val MarromHome = Color(0xFF38251A)
@@ -56,8 +57,9 @@ private val BordaHome = Color(0xFFEDE2D0)
 
 @Composable
 fun HomeScreen(
-    onAbrirDetalheReceita: () -> Unit,
-    onAbrirBusca: () -> Unit
+    onAbrirDetalheReceita: (Long) -> Unit,
+    onAbrirBusca: () -> Unit,
+    onVerTodasReceitas: () -> Unit
 ) {
 
     val abaSelecionada = remember {
@@ -111,25 +113,34 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(30.dp))
 
-                    ReceitasPopularesHome()
+                    ReceitasPopularesHome(
+                        onAbrirReceita = onAbrirDetalheReceita
+                    )
                 }
 
                 "Receitas da semana" -> {
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    ReceitasDaSemanaHome()
+                    ReceitasDaSemanaHome(
+                        onAbrirReceita = onAbrirDetalheReceita
+                    )
                 }
 
                 else -> {
 
                     Spacer(modifier = Modifier.height(34.dp))
 
-                    ReceitaDoDiaHome()
+                    ReceitaDoDiaHome(
+                        onAbrirReceita = onAbrirDetalheReceita
+                    )
 
                     Spacer(modifier = Modifier.height(28.dp))
 
-                    ReceitasRapidasHome()
+                    ReceitasRapidasHome(
+                        onAbrirReceita = onAbrirDetalheReceita,
+                        onVerTodas = onVerTodasReceitas
+                    )
                 }
             }
 
@@ -197,7 +208,8 @@ private fun CabecalhoHome() {
     }
 
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .height(1.dp)
             .background(BordaHome)
     )
@@ -464,173 +476,29 @@ private fun AbaHome(
 
 @Composable
 private fun ReceitaSeguindoHome(
-    onAbrirReceita: () -> Unit
+    onAbrirReceita: (Long) -> Unit
 ) {
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 28.dp)
-            .clickable { onAbrirReceita() }
-            .clip(RoundedCornerShape(22.dp))
-            .background(Color.White)
-            .border(
-                width = 1.5.dp,
-                color = BordaHome,
-                shape = RoundedCornerShape(22.dp)
-            )
-    ) {
-
-        // IMAGEM E ELEMENTOS SOBREPOSTOS
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(230.dp)
-        ) {
-
-            // IMAGEM DA RECEITA
-
-            Image(
-                painter = painterResource(
-                    R.drawable.frango_ao_limao_siciliano
-                ),
-                contentDescription = "Frango ao Limão Siciliano",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-
-            // CATEGORIA DA RECEITA
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(12.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(VerdeHome)
-                    .padding(
-                        horizontal = 12.dp,
-                        vertical = 6.dp
-                    )
-            ) {
-
-                Text(
-                    text = "ALMOÇO",
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // AUTOR DA RECEITA
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(7.dp)
-            ) {
-
-                // INICIAIS DO AUTOR
-
-                Box(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .background(
-                            VerdeHome,
-                            CircleShape
-                        )
-                        .border(
-                            1.5.dp,
-                            Color.White,
-                            CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    Text(
-                        text = "AC",
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                // NOME DO AUTOR
-
-                Text(
-                    text = "Ana Costa",
-                    color = Color.White,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-
-        // INFORMAÇÕES DA RECEITA
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 12.dp,
-                    vertical = 12.dp
-                )
-        ) {
-
-            Text(
-                text = "Frango ao Limão Siciliano",
-                color = MarromHome,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Spacer(modifier = Modifier.height(5.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-
-                Text(
-                    text = "◷",
-                    color = VerdeHome,
-                    fontSize = 19.sp
-                )
-
-                Text(
-                    text = "40 min",
-                    color = CinzaHome,
-                    fontSize = 14.sp
-                )
-
-                Text(
-                    text = "♨",
-                    color = VerdeHome,
-                    fontSize = 17.sp
-                )
-
-                Text(
-                    text = "Fácil",
-                    color = CinzaHome,
-                    fontSize = 14.sp
-                )
-            }
-        }
-    }
+    ReceitaCard(
+        receitaId = 1L,
+        imagem = R.drawable.frango_ao_limao_siciliano,
+        titulo = "Frango ao Limão Siciliano",
+        categoria = "ALMOÇO",
+        tempo = "40 min",
+        dificuldade = "Fácil",
+        autorNome = "Ana Costa",
+        autorFoto = "",
+        onClick = onAbrirReceita
+    )
 }
 
 @Composable
-private fun ReceitasPopularesHome() {
+private fun ReceitasPopularesHome(
+    onAbrirReceita: (Long) -> Unit
+) {
 
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-
-        // TÍTULO E VER TODAS
 
         Row(
             modifier = Modifier
@@ -644,6 +512,7 @@ private fun ReceitasPopularesHome() {
                 text = "Populares da Semana",
                 color = MarromHome,
                 fontFamily = PlayfairDisplay,
+                fontWeight = FontWeight.Bold,
                 fontSize = 23.sp,
                 modifier = Modifier.clickable {
                     // Navegação será implementada posteriormente.
@@ -653,8 +522,6 @@ private fun ReceitasPopularesHome() {
 
         Spacer(modifier = Modifier.height(22.dp))
 
-        // PRIMEIRA LINHA DE RECEITAS
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -664,25 +531,27 @@ private fun ReceitasPopularesHome() {
 
             ReceitaPopularCardHome(
                 modifier = Modifier.weight(1f),
+                receitaId = 2L,
                 imagem = R.drawable.frango_ao_limao,
                 nome = "Frango ao Limão",
                 tempo = "30 min",
-                porcoes = "2 porções"
+                porcoes = "2 porções",
+                onClick = onAbrirReceita
             )
 
             ReceitaPopularCardHome(
                 modifier = Modifier.weight(1f),
+                receitaId = 3L,
                 imagem = R.drawable.sopa_de_abobora,
                 nome = "Sopa de Abóbora",
                 tempo = "40 min",
-                porcoes = "4 porções"
+                porcoes = "4 porções",
+                onClick = onAbrirReceita
             )
         }
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // SEGUNDA LINHA DE RECEITAS
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -692,25 +561,31 @@ private fun ReceitasPopularesHome() {
 
             ReceitaPopularCardHome(
                 modifier = Modifier.weight(1f),
+                receitaId = 4L,
                 imagem = R.drawable.pesto_de_manjericao,
                 nome = "Macarrão ao Pesto",
                 tempo = "15 min",
-                porcoes = "2 porções"
+                porcoes = "2 porções",
+                onClick = onAbrirReceita
             )
 
             ReceitaPopularCardHome(
                 modifier = Modifier.weight(1f),
+                receitaId = 6L,
                 imagem = R.drawable.pao_de_queijo,
                 nome = "Pão de Queijo",
                 tempo = "25 min",
-                porcoes = "12 unidades"
+                porcoes = "12 unidades",
+                onClick = onAbrirReceita
             )
         }
     }
 }
 
 @Composable
-private fun ReceitasDaSemanaHome() {
+private fun ReceitasDaSemanaHome(
+    onAbrirReceita: (Long) -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -732,43 +607,48 @@ private fun ReceitasDaSemanaHome() {
 
         // PRIMEIRO LUGAR
 
-         ReceitaCampeaHome()
+        ReceitaCampeaHome(
+            onAbrirReceita = onAbrirReceita
+        )
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // SEGUNDO LUGAR
-
         ReceitaRankingCompactaHome(
+            receitaId = 8L,
             imagem = R.drawable.moqueca_baiana,
             posicao = "#2 LUGAR · PRATA",
             corPosicao = Color(0xffb0b0b0),
             nome = "Moqueca Baiana Aromática",
             tempo = "50 min",
-            dificuldade = "Médio"
+            dificuldade = "Médio",
+            onClick = onAbrirReceita
         )
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // TERCEIRO LUGAR
-
         ReceitaRankingCompactaHome(
+            receitaId = 9L,
             imagem = R.drawable.picanha_na_brasa_com_alho,
             posicao = "#3 LUGAR · BRONZE",
             corPosicao = Color(0xffcd7f32),
             nome = "Picanha na Brasa com Alho",
             tempo = "35 min",
-            dificuldade = "Fácil"
+            dificuldade = "Fácil",
+            onClick = onAbrirReceita
         )
     }
 }
 
 @Composable
-private fun ReceitaCampeaHome() {
+private fun ReceitaCampeaHome(
+    onAbrirReceita: (Long) -> Unit
+) {
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
+            .clickable { onAbrirReceita(7L) }
             .background(Color.White)
             .border(
                 width = 2.dp,
@@ -895,10 +775,10 @@ private fun ReceitaCampeaHome() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                Text(
-                    text = "◷",
-                    color = CinzaHome,
-                    fontSize = 17.sp
+                Image(
+                    painter = painterResource(R.drawable.icon_relogio),
+                    modifier = Modifier.width(20.dp),
+                    contentDescription = "Relógio"
                 )
 
                 Text(
@@ -909,10 +789,10 @@ private fun ReceitaCampeaHome() {
 
                 Spacer(modifier = Modifier.width(5.dp))
 
-                Text(
-                    text = "▥",
-                    color = CinzaHome,
-                    fontSize = 17.sp
+                Image(
+                    painter = painterResource(R.drawable.icon_talheres),
+                    modifier = Modifier.width(20.dp),
+                    contentDescription = "Dificuldade"
                 )
 
                 Text(
@@ -932,9 +812,7 @@ private fun ReceitaCampeaHome() {
                     .height(54.dp)
                     .clip(RoundedCornerShape(14.dp))
                     .background(VerdeHome)
-                    .clickable {
-                        // Navegação para a receita será implementada depois.
-                    },
+                    .clickable { onAbrirReceita(7L) },
                 contentAlignment = Alignment.Center
             ) {
 
@@ -952,18 +830,21 @@ private fun ReceitaCampeaHome() {
 
 @Composable
 private fun ReceitaRankingCompactaHome(
+    receitaId: Long,
     imagem: Int,
     posicao: String,
     corPosicao: Color,
     nome: String,
     tempo: String,
-    dificuldade: String
+    dificuldade: String,
+    onClick: (Long) -> Unit
 ) {
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
+            .clickable { onClick(receitaId) }
             .background(Color.White)
             .border(
                 width = 1.5.dp,
@@ -1062,15 +943,18 @@ private fun ReceitaRankingCompactaHome(
 @Composable
 private fun ReceitaPopularCardHome(
     modifier: Modifier = Modifier,
+    receitaId: Long,
     imagem: Int,
     nome: String,
     tempo: String,
-    porcoes: String
+    porcoes: String,
+    onClick: (Long) -> Unit
 ) {
 
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(20.dp))
+            .clickable { onClick(receitaId) }
             .background(Color.White)
             .border(
                 width = 1.5.dp,
@@ -1145,7 +1029,9 @@ private fun ReceitaPopularCardHome(
 // RECEITA DO DIA
 
 @Composable
-private fun ReceitaDoDiaHome() {
+private fun ReceitaDoDiaHome(
+    onAbrirReceita: (Long) -> Unit
+) {
 
     Box(
         modifier = Modifier
@@ -1153,6 +1039,7 @@ private fun ReceitaDoDiaHome() {
             .padding(horizontal = 28.dp)
             .height(230.dp)
             .clip(RoundedCornerShape(24.dp))
+            .clickable { onAbrirReceita(10L) }
     ) {
 
         Image(
@@ -1211,9 +1098,11 @@ private fun ReceitaDoDiaHome() {
         }
     }
 }
-
 @Composable
-private fun ReceitasRapidasHome() {
+private fun ReceitasRapidasHome(
+    onAbrirReceita: (Long) -> Unit,
+    onVerTodas: () -> Unit
+) {
 
     Column {
         Row(
@@ -1237,7 +1126,7 @@ private fun ReceitasRapidasHome() {
                 color = VerdeHome,
                 fontSize = 16.sp,
                 modifier = Modifier.clickable {
-                    // Navegação será ligada posteriormente.
+                    onVerTodas()
                 }
             )
         }
@@ -1252,22 +1141,15 @@ private fun ReceitasRapidasHome() {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            ReceitaCardHome(
+            ReceitaMiniCard(
+                modifier = Modifier
+                    .width(IntrinsicSize.Max)
+                    .widthIn(min = 170.dp, max = 230.dp),
+                receitaId = 5L,
                 imagem = R.drawable.frango_ao_limao,
-                nome = "Frango ao Limão",
-                tempo = "25 min"
-            )
-
-            ReceitaCardHome(
-                imagem = R.drawable.sopa_de_abobora,
-                nome = "Sopa de Abóbora",
-                tempo = "30 min"
-            )
-
-            ReceitaCardHome(
-                imagem = R.drawable.pesto_de_manjericao,
-                nome = "Macarrão ao Pesto",
-                tempo = "15 min"
+                titulo = "Frango ao Limão",
+                tempo = "25 min",
+                onClick = onAbrirReceita
             )
         }
     }
@@ -1276,9 +1158,11 @@ private fun ReceitasRapidasHome() {
 
 @Composable
 private fun ReceitaCardHome(
+    receitaId: Long,
     imagem: Int,
     nome: String,
-    tempo: String
+    tempo: String,
+    onClick: (Long) -> Unit
 ) {
 
     Column(
@@ -1289,6 +1173,7 @@ private fun ReceitaCardHome(
                 max = 230.dp
             )
             .clip(RoundedCornerShape(20.dp))
+            .clickable { onClick(receitaId) }
             .background(Color.White)
             .border(
                 width = 1.5.dp,
@@ -1390,7 +1275,8 @@ fun NavegacaoInferiorHome(
 
                 // BUSCAR
                 Box(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .offset(x = (-12).dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -1404,7 +1290,8 @@ fun NavegacaoInferiorHome(
 
                 // COMUNIDADES
                 Box(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .offset(x = 12.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -1637,7 +1524,7 @@ private fun PainelPesquisaUsuariosHome(
                 onValueChange = onTextoPesquisaChange,
                 modifier = Modifier.weight(1f),
                 singleLine = true,
-                textStyle = androidx.compose.ui.text.TextStyle(
+                textStyle = TextStyle(
                     color = Color(0xFF6D1D32),
                     fontSize = 15.sp
                 ),

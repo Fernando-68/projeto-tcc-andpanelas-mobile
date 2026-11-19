@@ -63,12 +63,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.tccmobile.ui.theme.PlayfairDisplay
 import com.example.tccmobile.ui.theme.TCCMobileTheme
-import com.example.tccmobile.LoginScreen
-import com.example.tccmobile.CadastroScreen
+import com.example.tccmobile.cadastro.CadastroScreen
 import com.example.tccmobile.navigation.Routes
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.tccmobile.data.EmailDataStore
+import com.example.tccmobile.home.HomeScreen
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -240,11 +240,14 @@ class MainActivity : ComponentActivity() {
 
                     composable(Routes.HOME) {
                         HomeScreen(
-                            onAbrirDetalheReceita = {
-                                navController.navigate(Routes.DETALHE_RECEITA)
+                            onAbrirDetalheReceita = { receitaId ->
+                                navController.navigate(Routes.detalheReceita(receitaId))
                             },
                             onAbrirBusca = {
                                 navController.navigate(Routes.BUSCA)
+                            },
+                            onVerTodasReceitas = {
+                                navController.navigate(Routes.RECEITAS_RAPIDAS)
                             }
                         )
                     }
@@ -255,16 +258,33 @@ class MainActivity : ComponentActivity() {
                                 navController.popBackStack()
                             },
                             onAbrirDetalheReceita = {
-                                navController.navigate(Routes.DETALHE_RECEITA)
+                                navController.navigate(Routes.detalheReceita(1L))
                             }
                         )
                     }
 
-                    composable (Routes.DETALHE_RECEITA) {
-
+                    composable(
+                        route = Routes.DETALHE_RECEITA,
+                        arguments = listOf(
+                            navArgument("receitaId") {
+                                type = NavType.LongType
+                            }
+                        )
+                    ) {
                         DetalheReceitaScreen(
                             onVoltar = {
                                 navController.popBackStack()
+                            }
+                        )
+                    }
+
+                    composable(Routes.RECEITAS_RAPIDAS) {
+                        ReceitasRapidasScreen(
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+                            onAbrirReceita = { receitaId ->
+                                navController.navigate(Routes.detalheReceita(receitaId))
                             }
                         )
                     }

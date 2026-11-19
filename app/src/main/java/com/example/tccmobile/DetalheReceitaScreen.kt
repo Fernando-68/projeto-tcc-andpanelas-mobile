@@ -30,6 +30,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.tccmobile.home.NavegacaoInferiorHome
 
 private val FundoDetalhe = Color(0xFFFFFCF8)
 private val MarromDetalhe = Color(0xFF38251A)

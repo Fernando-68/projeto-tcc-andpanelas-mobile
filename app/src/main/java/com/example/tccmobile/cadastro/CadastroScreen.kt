@@ -1,10 +1,10 @@
-package com.example.tccmobile
+package com.example.tccmobile.cadastro
 
-import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeFormatter
-import java.time.format.ResolverStyle
-import java.util.Locale
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,25 +32,39 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tccmobile.R
 import com.example.tccmobile.ui.theme.PlayfairDisplay
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import com.example.tccmobile.viewmodel.CadastroViewModel
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.time.format.ResolverStyle
+import java.util.Locale
 
 private val FundoCadastro = Color(0xfffffcf8)
 private val MarromCadastro = Color(0xff38251a)
@@ -115,6 +131,26 @@ fun CadastroScreen (
     }
 
     val erroTermos = tentouCriarConta && !aceitouTermos
+
+    val viewModel: CadastroViewModel = viewModel()
+    val foto by viewModel.foto.collectAsState()
+
+    val contexto = LocalContext.current
+    val solicitarFoto = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+
+    val imagemFoto = remember(foto.uri) {
+        foto.uri?.let {
+            runCatching {
+                contexto.contentResolver.openInputStream(Uri.parse(it))?.use { s ->
+                    BitmapFactory.decodeStream(s)
+                }?.asImageBitmap()
+            }.getOrNull()
+        }
+    }
+
+    val seletorFoto = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        uri?.let(viewModel::selecionarFoto)
+    }
 
     Column(
         modifier = Modifier
@@ -189,9 +225,10 @@ fun CadastroScreen (
                     .padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // CÍRCULO TRACEJADO COM A CÂMERA CENTRALIZADA
                 Box(
-                    modifier = Modifier.size(88.dp),
+                    modifier = Modifier
+                        .size(88.dp)
+                        .clickable { seletorFoto.launch(solicitarFoto) },
                     contentAlignment = Alignment.Center
                 ) {
                     androidx.compose.foundation.Canvas(
@@ -213,19 +250,29 @@ fun CadastroScreen (
                         )
                     }
 
-                    Image(
-                        painter = painterResource(
-                            id = R.drawable.camera
-                        ),
-                        contentDescription = "Adicionar foto de perfil",
-                        modifier = Modifier.size(36.dp),
-                        contentScale = ContentScale.Fit
-                    )
+                    if (imagemFoto != null) {
+                        Image(
+                            bitmap = imagemFoto,
+                            contentDescription = "Foto de perfil",
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(
+                                id = R.drawable.camera
+                            ),
+                            contentDescription = "Adicionar foto de perfil",
+                            modifier = Modifier.size(36.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // TEXTOS AO LADO DA CÂMERA
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.Center
@@ -248,13 +295,16 @@ fun CadastroScreen (
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Carregar foto",
-                        color = VerdeCadastro,
+                        text = when {
+                            foto.enviando -> "Enviando foto..."
+                            foto.erro -> "Falha no envio, toque para tentar de novo"
+                            foto.url.isNotEmpty() -> "Trocar foto"
+                            else -> "Carregar foto"
+                        },
+                        color = if (foto.erro) Color(0xffb3261e) else VerdeCadastro,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.clickable {
-                            // Ação de carregar foto será implementada depois.
-                        }
+                        modifier = Modifier.clickable { seletorFoto.launch(solicitarFoto) }
                     )
                 }
             }
@@ -333,9 +383,9 @@ fun CadastroScreen (
                 singleLine = true,
                 isError = erroSenha != null,
                 visualTransformation = if (senhaVisivel) {
-                    androidx.compose.ui.text.input.VisualTransformation.None
+                    VisualTransformation.None
                 } else {
-                    androidx.compose.ui.text.input.PasswordVisualTransformation()
+                    PasswordVisualTransformation()
                 },
                 trailingIcon = {
                     Text(
@@ -423,7 +473,7 @@ fun CadastroScreen (
 
                 ClickableText(
                     text = textoTermos,
-                    style = androidx.compose.ui.text.TextStyle(
+                    style = TextStyle(
                         color = CinzaCadastro,
                         fontSize = 13.sp,
                         lineHeight = 19.sp
