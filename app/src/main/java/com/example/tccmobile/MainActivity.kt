@@ -1,7 +1,7 @@
 package com.example.tccmobile
 
-import android.os.Bundle
 import android.net.Uri
+import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,6 +44,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -57,19 +59,20 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
-import androidx.navigation.navArgument
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.tccmobile.ui.theme.PlayfairDisplay
-import com.example.tccmobile.ui.theme.TCCMobileTheme
-import com.example.tccmobile.navigation.Routes
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.navArgument
 import com.example.tccmobile.cadastro.CadastroScreen
 import com.example.tccmobile.data.EmailDataStore
-import kotlinx.coroutines.launch
 import com.example.tccmobile.home.HomeScreen
+import com.example.tccmobile.navigation.Routes
+import com.example.tccmobile.perfil.EditarInformacoesScreen
+import com.example.tccmobile.perfil.EditarPerfilScreen
+import com.example.tccmobile.perfil.PerfilScreen
+import com.example.tccmobile.ui.theme.PlayfairDisplay
+import com.example.tccmobile.ui.theme.TCCMobileTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -273,6 +276,9 @@ class MainActivity : ComponentActivity() {
                             },
                             onVerTodasReceitas = {
                                 navController.navigate(Routes.RECEITAS_RAPIDAS)
+                            },
+                            onAbrirPerfil = {
+                                navController.navigate(Routes.PERFIL)
                             }
                         )
                     }
@@ -353,6 +359,82 @@ class MainActivity : ComponentActivity() {
                             onGeladeiraClick = {
                                 navegarParaSecao(Routes.GELADEIRA)
                             }
+                        )
+                    }
+
+                    composable(Routes.PERFIL) {
+                        PerfilScreen(
+                            usuarioId = null,
+                            onEditarPerfil = {
+                                navController.navigate(Routes.EDITAR_PERFIL)
+                            },
+                            onAbrirConfiguracoes = {
+                                navController.navigate(Routes.EDITAR_INFORMACOES)
+                            },
+                            onAbrirReceita = { receitaId ->
+                                navController.navigate(Routes.detalheReceita(receitaId))
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Routes.PERFIL_USUARIO,
+                        arguments = listOf(
+                            navArgument("usuarioId") {
+                                type = NavType.LongType
+                            }
+                        )
+                    ) { backStackEntry ->
+                        PerfilScreen(
+                            usuarioId = backStackEntry.arguments?.getLong("usuarioId"),
+                            onEditarPerfil = {},
+                            onAbrirConfiguracoes = {},
+                            onAbrirReceita = { receitaId ->
+                                navController.navigate(Routes.detalheReceita(receitaId))
+                            }
+                        )
+                    }
+
+                    composable(Routes.EDITAR_PERFIL) {
+                        EditarPerfilScreen(
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+                            onSalvo = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+
+                    composable(Routes.EDITAR_INFORMACOES) {
+                        EditarInformacoesScreen(
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+                            onConfirmarAlteracao = { email ->
+                                navController.navigate(
+                                    Routes.CONFIRMAR_ALTERACAO.replace("{email}", Uri.encode(email))
+                                )
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Routes.CONFIRMAR_ALTERACAO,
+                        arguments = listOf(
+                            navArgument("email") {
+                                type = NavType.StringType
+                            }
+                        )
+                    ) { backStackEntry ->
+                        VerificacaoCodigoScreen(
+                            email = backStackEntry.arguments?.getString("email") ?: "",
+                            onVerificarClick = { codigo ->
+                                if (codigo == "000000") {
+                                    navController.popBackStack()
+                                }
+                            },
+                            onReenviarCodigo = {}
                         )
                     }
 
