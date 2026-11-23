@@ -8,18 +8,18 @@ object Routes {
 
     const val CODIGO_RECUPERACAO = "codigo-recuperacao/{email}"
 
-    const val NOVA_SENHA = "nova-sennha"
+    const val NOVA_SENHA = "nova-senha"
 
     const val HOME = "home"
 
     const val TERMOS_PRIVACIDADE = "termos-privacidade"
 
-    const val DETALHE_RECEITA = "detalhe-receita"
+    const val DETALHE_RECEITA = "detalhe-receita/{receitaId}"
+
+    fun detalheReceita(receitaId: Long) = "detalhe-receita/$receitaId"
 
     const val BUSCA = "busca"
 
-    const val COMUNIDADES = "comunidades"
-
-    const val GELADEIRA = "geladeira"
+    const val RECEITAS_RAPIDAS = "receitas-rapidas"
 }
 

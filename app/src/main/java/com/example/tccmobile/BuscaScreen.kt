@@ -22,10 +22,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material3.Surface
+import com.example.tccmobile.home.NavegacaoInferiorHome
 
 private val FundoBusca = Color(0xFFFFFCF8)
 private val MarromBusca = Color(0xFF38251A)
