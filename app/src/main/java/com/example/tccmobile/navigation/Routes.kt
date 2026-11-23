@@ -25,5 +25,17 @@ object Routes {
     const val COMUNIDADES = "comunidades"
 
     const val GELADEIRA = "geladeira"
+
+    const val PERFIL = "perfil"
+
+    const val PERFIL_USUARIO = "perfil/{usuarioId}"
+
+    fun perfilUsuario(usuarioId: Long) = "perfil/$usuarioId"
+
+    const val EDITAR_PERFIL = "editar-perfil"
+
+    const val EDITAR_INFORMACOES = "editar-informacoes"
+
+    const val CONFIRMAR_ALTERACAO = "confirmar-alteracao/{email}"
 }
 
