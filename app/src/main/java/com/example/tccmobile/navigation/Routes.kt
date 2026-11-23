@@ -21,5 +21,9 @@ object Routes {
     const val BUSCA = "busca"
 
     const val RECEITAS_RAPIDAS = "receitas-rapidas"
+
+    const val COMUNIDADES = "comunidades"
+
+    const val GELADEIRA = "geladeira"
 }
 

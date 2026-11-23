@@ -59,6 +59,8 @@ private val BordaHome = Color(0xFFEDE2D0)
 fun HomeScreen(
     onAbrirDetalheReceita: (Long) -> Unit,
     onAbrirBusca: () -> Unit,
+    onAbrirComunidades: () -> Unit,
+    onAbrirGeladeira: () -> Unit,
     onVerTodasReceitas: () -> Unit
 ) {
 
@@ -151,7 +153,10 @@ fun HomeScreen(
 
         NavegacaoInferiorHome(
             telaSelecionada = "Início",
-            onBuscarClick = onAbrirBusca
+            onInicioClick = {},
+            onBuscarClick = onAbrirBusca,
+            onComunidadesClick = onAbrirComunidades,
+            onGeladeiraClick = onAbrirGeladeira
         )
     }
 }
@@ -1227,8 +1232,11 @@ private fun ReceitaCardHome(
 
 @Composable
 fun NavegacaoInferiorHome(
-    telaSelecionada: String = "Início",
-    onBuscarClick: () -> Unit = {}
+    telaSelecionada: String,
+    onInicioClick: () -> Unit,
+    onBuscarClick: () -> Unit,
+    onComunidadesClick: () -> Unit,
+    onGeladeiraClick: () -> Unit
 ) {
 
     Column(
@@ -1269,7 +1277,8 @@ fun NavegacaoInferiorHome(
                     ItemNavegacaoHome(
                         imagem = R.drawable.home,
                         texto = "Início",
-                        selecionado = telaSelecionada == "Início"
+                        selecionado = telaSelecionada == "Início",
+                        onClick = onInicioClick
                     )
                 }
 
@@ -1298,7 +1307,8 @@ fun NavegacaoInferiorHome(
                     ItemNavegacaoHome(
                         imagem = R.drawable.users_alter,
                         texto = "Comunidades",
-                        selecionado = telaSelecionada == "Comunidades"
+                        selecionado = telaSelecionada == "Comunidades",
+                        onClick = onComunidadesClick
                     )
                 }
 
@@ -1310,7 +1320,8 @@ fun NavegacaoInferiorHome(
                     ItemNavegacaoHome(
                         imagem = R.drawable.geladeira,
                         texto = "Geladeira",
-                        selecionado = telaSelecionada == "Geladeira"
+                        selecionado = telaSelecionada == "Geladeira",
+                        onClick = onGeladeiraClick
                     )
                 }
             }

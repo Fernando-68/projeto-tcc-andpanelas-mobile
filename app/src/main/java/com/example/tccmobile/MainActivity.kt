@@ -66,8 +66,10 @@ import com.example.tccmobile.ui.theme.TCCMobileTheme
 import com.example.tccmobile.navigation.Routes
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.rememberCoroutineScope
+import com.example.tccmobile.cadastro.CadastroScreen
 import com.example.tccmobile.data.EmailDataStore
 import kotlinx.coroutines.launch
+import com.example.tccmobile.home.HomeScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -127,7 +129,10 @@ class MainActivity : ComponentActivity() {
                             },
                             onCadastroConcluido = { email ->
                                 navController.navigate(
-                                    "verificacao-codigo/$email"
+                                    Routes.VERIFICACAO_CODIGO.replace(
+                                        "{email}",
+                                        Uri.encode(email)
+                                    )
                                 )
                             },
                             onAbrirTermos = {
@@ -242,7 +247,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Routes.LOGIN) {
 
                                     popUpTo(Routes.LOGIN) {
-                                        inclusive = false
+                                        inclusive = true
                                     }
 
                                     launchSingleTop = true
@@ -254,8 +259,8 @@ class MainActivity : ComponentActivity() {
                     composable(Routes.HOME) {
 
                         HomeScreen(
-                            onAbrirDetalheReceita = {
-                                navController.navigate(Routes.DETALHE_RECEITA)
+                            onAbrirDetalheReceita = { receitaId ->
+                                navController.navigate(Routes.detalheReceita(receitaId))
                             },
                             onAbrirBusca = {
                                 navegarParaSecao(Routes.BUSCA)
@@ -265,6 +270,9 @@ class MainActivity : ComponentActivity() {
                             },
                             onAbrirGeladeira = {
                                 navegarParaSecao(Routes.GELADEIRA)
+                            },
+                            onVerTodasReceitas = {
+                                navController.navigate(Routes.RECEITAS_RAPIDAS)
                             }
                         )
                     }
@@ -272,8 +280,8 @@ class MainActivity : ComponentActivity() {
                     composable(Routes.BUSCA) {
 
                         BuscaScreen(
-                            onAbrirDetalheReceita = {
-                                navController.navigate(Routes.DETALHE_RECEITA)
+                            onAbrirDetalheReceita = { receitaId ->
+                                navController.navigate(Routes.detalheReceita(receitaId))
                             },
                             onAbrirInicio = {
                                 navegarParaSecao(Routes.HOME)
@@ -317,8 +325,19 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    composable(Routes.DETALHE_RECEITA) {
+                    composable(
+                        route = Routes.DETALHE_RECEITA,
+                        arguments = listOf(
+                            navArgument("receitaId") {
+                                type = NavType.LongType
+                            }
+                        )
+                    ) { backStackEntry ->
+
+                        val receitaId = backStackEntry.arguments?.getLong("receitaId") ?: 0L
+
                         DetalheReceitaScreen(
+                            receitaId = receitaId,
                             onVoltar = {
                                 navController.popBackStack()
                             },
@@ -333,6 +352,19 @@ class MainActivity : ComponentActivity() {
                             },
                             onGeladeiraClick = {
                                 navegarParaSecao(Routes.GELADEIRA)
+                            }
+                        )
+                    }
+
+                    composable(Routes.RECEITAS_RAPIDAS) {
+                        ReceitasRapidasScreen(
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+                            onAbrirReceita = { receitaId ->
+                                navController.navigate(
+                                    Routes.detalheReceita(receitaId)
+                                )
                             }
                         )
                     }
@@ -682,13 +714,11 @@ fun LoginScreen(
                             focusManager.clearFocus()
 
                             coroutineScope.launch {
+
                                 emailDataStore.salvarEmail(email.trim())
+
+                                onLoginSucesso()
                             }
-
-                            //os campos passaram pelas validações
-                            mensagemResultado = "Dados preenchidos corretamente"
-
-                            onLoginSucesso()
 
                             //futuramente chamada para o ViewModel
                             //ViewModel -> API
@@ -832,42 +862,58 @@ fun HeroArea() {
     }
 }
 
-    private fun validarEmail(email: String): Boolean {
-        val emailNormalizado = email.trim()
 
-        // Aceita somente letras minúsculas e números antes de @gmail.com
-        val padraoEmail = Regex(
-            "^[a-z]+[a-z0-9]*@gmail\\.com$"
-        )
+private fun validarEmail(email: String): Boolean {
 
-        if (!padraoEmail.matches(emailNormalizado)) {
-            return false
-        }
+    val emailNormalizado = email.trim()
 
-        val nomeUsuario = emailNormalizado.substringBefore("@")
-
-        val quantidadeLetras = nomeUsuario.count { it in 'a'..'z' }
-
-        val quantidadeNumeros = nomeUsuario.count { it in '0'..'9' }
-
-        // Precisa ter pelo menos uma letra
-        if (quantidadeLetras == 0) {
-            return false
-        }
-
-        // Não permite somente uma letra seguida de números
-        if (quantidadeLetras == 1 && quantidadeNumeros > 0) {
-            return false
-        }
-
-        // Se houver números, exige pelo menos 4 letras
-        // OU uma combinação de letras e números com pelo menos 2 letras
-        if (quantidadeNumeros > 0 && quantidadeLetras < 2) {
-            return false
-        }
-
-        return true
+    // Precisa terminar exatamente com @gmail.com
+    if (!emailNormalizado.endsWith("@gmail.com")) {
+        return false
     }
+
+    // Separa o nome de usuário do domínio
+    val nomeUsuario = emailNormalizado.substringBefore("@")
+
+    // Permite somente letras minúsculas, números e pontos.
+    // Não permite pontos no início, no final ou consecutivos.
+    val padraoUsuario = Regex(
+        "^[a-z0-9]+(\\.[a-z0-9]+)*$"
+    )
+
+    if (!padraoUsuario.matches(nomeUsuario)) {
+        return false
+    }
+
+    // Os pontos não são considerados para o limite de caracteres.
+    val usuarioSemPontos = nomeUsuario.replace(".", "")
+
+    // Gmail exige entre 6 e 30 caracteres no nome de usuário.
+    if (usuarioSemPontos.length !in 6..30) {
+        return false
+    }
+
+    // Conta letras e números.
+    val quantidadeLetras = usuarioSemPontos.count {
+        it in 'a'..'z'
+    }
+
+    val quantidadeNumeros = usuarioSemPontos.count {
+        it in '0'..'9'
+    }
+
+    // Não permite nomes de usuário compostos somente por números.
+    if (quantidadeLetras == 0) {
+        return false
+    }
+
+    // Não permite somente uma letra acompanhada de números.
+    if (quantidadeLetras == 1 && quantidadeNumeros > 0) {
+        return false
+    }
+
+    return true
+}
 
 private fun validarSenha(senha: String): Boolean {
     val temMaiuscula = senha.any { it.isUpperCase() }

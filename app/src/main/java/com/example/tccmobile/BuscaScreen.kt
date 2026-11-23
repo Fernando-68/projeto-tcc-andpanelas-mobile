@@ -194,7 +194,7 @@ private val comunidadesDisponiveis = listOf(
 
 @Composable
 fun BuscaScreen(
-    onAbrirDetalheReceita: () -> Unit,
+    onAbrirDetalheReceita: (Long) -> Unit,
     onAbrirInicio: () -> Unit,
     onAbrirComunidades: () -> Unit,
     onAbrirGeladeira: () -> Unit
@@ -417,7 +417,9 @@ fun BuscaScreen(
                         onPesquisaChange = {
                             textoPesquisa = it
                         },
-                        onAbrirDetalheReceita = onAbrirDetalheReceita
+                        onAbrirDetalheReceita = {
+                            onAbrirDetalheReceita(1L)
+                        }
                     )
                 }
 

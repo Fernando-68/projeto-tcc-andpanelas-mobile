@@ -40,6 +40,7 @@ private val BordaDetalhe = Color(0xFFEDE2D0)
 
 @Composable
 fun DetalheReceitaScreen(
+    receitaId: Long,
     onVoltar: () -> Unit,
     onInicioClick: () -> Unit,
     onBuscarClick: () -> Unit,
