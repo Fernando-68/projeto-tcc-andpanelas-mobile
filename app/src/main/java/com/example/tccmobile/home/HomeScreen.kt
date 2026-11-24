@@ -61,7 +61,8 @@ fun HomeScreen(
     onAbrirBusca: () -> Unit,
     onAbrirComunidades: () -> Unit,
     onAbrirGeladeira: () -> Unit,
-    onVerTodasReceitas: () -> Unit
+    onVerTodasReceitas: () -> Unit,
+    onAbrirPerfil: () -> Unit
 ) {
 
     val abaSelecionada = remember {
@@ -76,7 +77,7 @@ fun HomeScreen(
 
         //CABEÇALHO FIXO
 
-        CabecalhoHome()
+        CabecalhoHome(onAbrirPerfil = onAbrirPerfil)
 
         // CONTEÚDO COM ROLAGEM VERTICAL
 
@@ -165,7 +166,7 @@ fun HomeScreen(
 // CABEÇALHO
 
 @Composable
-private fun CabecalhoHome() {
+private fun CabecalhoHome(onAbrirPerfil: () -> Unit) {
 
     Row(
         modifier = Modifier
@@ -199,7 +200,8 @@ private fun CabecalhoHome() {
                         width = 2.dp,
                         color = VerdeHome,
                         shape = CircleShape
-                    ),
+                    )
+                    .clickable { onAbrirPerfil() },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
