@@ -24,6 +24,18 @@ object Routes {
 
     const val COMUNIDADES = "comunidades"
 
+    const val CRIAR_COMUNIDADE = "criar-comunidade"
+
+    const val DETALHE_COMUNIDADE = "detalhe-comunidade/{nomeComunidade}"
+
+    fun detalheComunidade(nomeComunidade: String) =
+        "detalhe-comunidade/${android.net.Uri.encode(nomeComunidade)}"
+
+    const val DENUNCIAR_COMUNIDADE = "denunciar-comunidade/{nomeComunidade}"
+
+    fun denunciarComunidade(nomeComunidade: String) =
+        "denunciar-comunidade/${android.net.Uri.encode(nomeComunidade)}"
+
     const val GELADEIRA = "geladeira"
 
     const val PERFIL = "perfil"

@@ -301,8 +301,9 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    composable(Routes.COMUNIDADES) {
 
+
+                    composable(Routes.COMUNIDADES) {
                         ComunidadesScreen(
                             onAbrirInicio = {
                                 navegarParaSecao(Routes.HOME)
@@ -312,9 +313,129 @@ class MainActivity : ComponentActivity() {
                             },
                             onAbrirGeladeira = {
                                 navegarParaSecao(Routes.GELADEIRA)
+                            },
+                            onCriarComunidade = {
+                                navController.navigate(Routes.CRIAR_COMUNIDADE)
+                            },
+                            onAbrirComunidade = {
+                                navController.navigate(
+                                    Routes.detalheComunidade("Veganos Criativos")
+                                )
                             }
                         )
                     }
+
+
+
+                    composable(Routes.CRIAR_COMUNIDADE) {
+
+                        CriarComunidadeScreen(
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+                            onCriarComunidade = { nome, descricao, categoria, publica ->
+
+                                // Criação simulada.
+                                // Posteriormente, enviaremos os dados ao ViewModel e à API.
+
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Comunidade criada com sucesso!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                navController.popBackStack()
+                            },
+                            onAbrirInicio = {
+                                navegarParaSecao(Routes.HOME)
+                            },
+                            onAbrirBusca = {
+                                navegarParaSecao(Routes.BUSCA)
+                            },
+                            onAbrirComunidades = {
+                                navegarParaSecao(Routes.COMUNIDADES)
+                            },
+                            onAbrirGeladeira = {
+                                navegarParaSecao(Routes.GELADEIRA)
+                            }
+                        )
+                    }
+
+
+                    composable(
+                        route = Routes.DETALHE_COMUNIDADE,
+                        arguments = listOf(
+                            navArgument("nomeComunidade") {
+                                type = NavType.StringType
+                            }
+                        )
+                    ) { backStackEntry ->
+
+                        val nomeComunidade =
+                            backStackEntry.arguments?.getString("nomeComunidade")
+                                ?: "Veganos Criativos"
+
+                        DetalheComunidadeScreen(
+                            nomeComunidade = nomeComunidade,
+
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+
+                            onDenunciar = {
+                                navController.navigate(
+                                    Routes.denunciarComunidade(nomeComunidade)
+                                )
+                            },
+
+                            onAbrirInicio = {
+                                navegarParaSecao(Routes.HOME)
+                            },
+
+                            onAbrirBusca = {
+                                navegarParaSecao(Routes.BUSCA)
+                            },
+
+                            onAbrirGeladeira = {
+                                navegarParaSecao(Routes.GELADEIRA)
+                            }
+                        )
+                    }
+
+
+                    composable(
+                        route = Routes.DENUNCIAR_COMUNIDADE,
+                        arguments = listOf(
+                            navArgument("nomeComunidade") {
+                                type = NavType.StringType
+                            }
+                        )
+                    ) { backStackEntry ->
+
+                        val nomeComunidade =
+                            backStackEntry.arguments?.getString("nomeComunidade") ?: ""
+
+                        DenunciarComunidadeScreen(
+                            nomeComunidade = nomeComunidade,
+                            onCancelar = {
+                                navController.popBackStack()
+                            },
+                            onEnviarDenuncia = { motivo, detalhes ->
+
+                                // Denúncia simulada.
+                                // Posteriormente, enviaremos os dados ao ViewModel e à API.
+
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Denúncia enviada para análise.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+
 
                     composable(Routes.GELADEIRA) {
 
