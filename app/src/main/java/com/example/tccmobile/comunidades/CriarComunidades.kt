@@ -1,6 +1,7 @@
 
-package com.example.tccmobile
+package com.example.tccmobile.comunidades
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,11 +30,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tccmobile.R
 import com.example.tccmobile.home.NavegacaoInferiorHome
 
 private val FundoCriarComunidade = Color(0xFFFFFCF8)
@@ -45,7 +49,7 @@ private val TextoCriarComunidade = Color(0xFF9A887D)
 @Composable
 fun CriarComunidadeScreen(
     onVoltar: () -> Unit,
-    onCriarComunidade: (String, String, String, Boolean) -> Unit,
+    onCriarComunidade: (String, String, String) -> Unit,
     onAbrirInicio: () -> Unit,
     onAbrirBusca: () -> Unit,
     onAbrirComunidades: () -> Unit,
@@ -53,15 +57,22 @@ fun CriarComunidadeScreen(
 ) {
     var nome by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
+
     var categoriaSelecionada by remember {
         mutableStateOf("Confeitaria & Doces")
     }
-    var categoriaPersonalizada by remember { mutableStateOf("") }
+
+    var categoriaPersonalizada by remember {
+        mutableStateOf("")
+    }
+
     var mostrarCategoriaPersonalizada by remember {
         mutableStateOf(false)
     }
-    var comunidadePublica by remember { mutableStateOf(true) }
-    var mostrarErro by remember { mutableStateOf(false) }
+
+    var mostrarErro by remember {
+        mutableStateOf(false)
+    }
 
     val categorias = listOf(
         "Confeitaria & Doces",
@@ -100,7 +111,9 @@ fun CriarComunidadeScreen(
                             Color(0xFFF5EEE5),
                             CircleShape
                         )
-                        .clickable { onVoltar() },
+                        .clickable {
+                            onVoltar()
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -152,7 +165,7 @@ fun CriarComunidadeScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // CAPA
+                // CAPA DA COMUNIDADE
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -172,10 +185,12 @@ fun CriarComunidadeScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "▧",
-                            color = TextoCriarComunidade,
-                            fontSize = 27.sp
+                        Image(
+                            painter = painterResource(
+                                id = R.drawable.icone_imagem
+                            ),
+                            contentDescription = "Adicionar imagem da capa",
+                            modifier = Modifier.size(32.dp)
                         )
 
                         Text(
@@ -240,7 +255,9 @@ fun CriarComunidadeScreen(
                 }
 
                 Spacer(modifier = Modifier.height(18.dp))
+
                 DividerCriarComunidade()
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // INFORMAÇÕES BÁSICAS
@@ -253,7 +270,10 @@ fun CriarComunidadeScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                CampoTituloCriarComunidade("Nome da comunidade *", "${nome.length}/60")
+                CampoTituloCriarComunidade(
+                    "Nome da comunidade *",
+                    "${nome.length}/60"
+                )
 
                 CampoTextoCriarComunidade(
                     valor = nome,
@@ -266,7 +286,10 @@ fun CriarComunidadeScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                CampoTituloCriarComunidade("Descrição *", "${descricao.length}/300")
+                CampoTituloCriarComunidade(
+                    "Descrição *",
+                    "${descricao.length}/300"
+                )
 
                 CampoTextoCriarComunidade(
                     valor = descricao,
@@ -282,7 +305,9 @@ fun CriarComunidadeScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // CATEGORIAS
-                CampoTituloCriarComunidade("Categoria principal *")
+                CampoTituloCriarComunidade(
+                    "Categoria principal *"
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -290,10 +315,12 @@ fun CriarComunidadeScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     categorias.chunked(2).forEach { grupo ->
+
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(7.dp)
                         ) {
                             grupo.forEach { categoria ->
+
                                 CategoriaCriarComunidade(
                                     texto = categoria,
                                     selecionada = categoriaSelecionada == categoria,
@@ -317,15 +344,23 @@ fun CriarComunidadeScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+
                     if (mostrarCategoriaPersonalizada) {
-                        Box(modifier = Modifier.weight(1f)) {
+
+                        Box(
+                            modifier = Modifier.weight(1f)
+                        ) {
                             CampoTextoCriarComunidade(
                                 valor = categoriaPersonalizada,
-                                aoAlterar = { categoriaPersonalizada = it },
+                                aoAlterar = {
+                                    categoriaPersonalizada = it
+                                },
                                 placeholder = "Outra categoria"
                             )
                         }
+
                     } else {
+
                         Text(
                             text = "Outra categoria",
                             color = TextoCriarComunidade,
@@ -374,38 +409,6 @@ fun CriarComunidadeScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
-                DividerCriarComunidade()
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // PRIVACIDADE
-                Text(
-                    text = "Privacidade e Acesso",
-                    color = MarromCriarComunidade,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                OpcaoPrivacidadeComunidade(
-                    titulo = "Comunidade Pública",
-                    descricao = "Qualquer pessoa pode encontrar e ver as publicações.",
-                    selecionada = comunidadePublica,
-                    icone = "◎",
-                    onClick = { comunidadePublica = true }
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OpcaoPrivacidadeComunidade(
-                    titulo = "Comunidade Privada",
-                    descricao = "Apenas membros aprovados podem acessar o conteúdo.",
-                    selecionada = !comunidadePublica,
-                    icone = "⌑",
-                    onClick = { comunidadePublica = false }
-                )
-
                 if (mostrarErro) {
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -423,6 +426,7 @@ fun CriarComunidadeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
+
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -436,7 +440,9 @@ fun CriarComunidadeScreen(
                                 Color.White,
                                 RoundedCornerShape(9.dp)
                             )
-                            .clickable { onVoltar() },
+                            .clickable {
+                                onVoltar()
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -456,6 +462,7 @@ fun CriarComunidadeScreen(
                                 RoundedCornerShape(9.dp)
                             )
                             .clickable {
+
                                 val categoriaFinal =
                                     if (categoriaSelecionada.isNotBlank()) {
                                         categoriaSelecionada
@@ -469,12 +476,13 @@ fun CriarComunidadeScreen(
                                     categoriaFinal.isNotBlank()
                                 ) {
                                     mostrarErro = false
+
                                     onCriarComunidade(
                                         nome.trim(),
                                         descricao.trim(),
-                                        categoriaFinal,
-                                        comunidadePublica
+                                        categoriaFinal
                                     )
+
                                 } else {
                                     mostrarErro = true
                                 }
@@ -548,7 +556,7 @@ private fun CampoTextoCriarComunidade(
     valor: String,
     aoAlterar: (String) -> Unit,
     placeholder: String,
-    altura: androidx.compose.ui.unit.Dp = 42.dp,
+    altura: Dp = 42.dp,
     multiline: Boolean = false
 ) {
     Box(
@@ -560,8 +568,14 @@ private fun CampoTextoCriarComunidade(
                 BordaCriarComunidade,
                 RoundedCornerShape(8.dp)
             )
-            .background(Color.White, RoundedCornerShape(8.dp))
-            .padding(horizontal = 11.dp, vertical = 9.dp),
+            .background(
+                Color.White,
+                RoundedCornerShape(8.dp)
+            )
+            .padding(
+                horizontal = 11.dp,
+                vertical = 9.dp
+            ),
         contentAlignment = if (multiline) {
             Alignment.TopStart
         } else {
@@ -578,6 +592,7 @@ private fun CampoTextoCriarComunidade(
                 fontSize = 11.sp
             ),
             decorationBox = { innerTextField ->
+
                 Box {
                     if (valor.isEmpty()) {
                         Text(
@@ -586,6 +601,7 @@ private fun CampoTextoCriarComunidade(
                             fontSize = 10.sp
                         )
                     }
+
                     innerTextField()
                 }
             }
@@ -604,95 +620,39 @@ private fun CategoriaCriarComunidade(
         modifier = modifier
             .border(
                 1.dp,
-                if (selecionada) VerdeCriarComunidade else BordaCriarComunidade,
+                if (selecionada) {
+                    VerdeCriarComunidade
+                } else {
+                    BordaCriarComunidade
+                },
                 RoundedCornerShape(20.dp)
             )
             .background(
-                if (selecionada) Color(0xFFE7F5EF) else Color.White,
+                if (selecionada) {
+                    Color(0xFFE7F5EF)
+                } else {
+                    Color.White
+                },
                 RoundedCornerShape(20.dp)
             )
-            .clickable { onClick() }
-            .padding(horizontal = 9.dp, vertical = 8.dp),
+            .clickable {
+                onClick()
+            }
+            .padding(
+                horizontal = 9.dp,
+                vertical = 8.dp
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = texto,
-            color = if (selecionada) Color(0xFF459B7E) else MarromCriarComunidade,
+            color = if (selecionada) {
+                Color(0xFF459B7E)
+            } else {
+                MarromCriarComunidade
+            },
             fontSize = 9.sp,
             textAlign = TextAlign.Center
         )
     }
 }
-
-@Composable
-private fun OpcaoPrivacidadeComunidade(
-    titulo: String,
-    descricao: String,
-    selecionada: Boolean,
-    icone: String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                1.dp,
-                if (selecionada) VerdeCriarComunidade else BordaCriarComunidade,
-                RoundedCornerShape(9.dp)
-            )
-            .background(
-                if (selecionada) Color(0xFFEAF6F0) else Color.White,
-                RoundedCornerShape(9.dp)
-            )
-            .clickable { onClick() }
-            .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = icone,
-            color = if (selecionada) VerdeCriarComunidade else TextoCriarComunidade,
-            fontSize = 20.sp
-        )
-
-        Spacer(modifier = Modifier.width(10.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = titulo,
-                color = MarromCriarComunidade,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = descricao,
-                color = TextoCriarComunidade,
-                fontSize = 9.sp
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .size(17.dp)
-                .border(
-                    1.dp,
-                    if (selecionada) VerdeCriarComunidade else BordaCriarComunidade,
-                    CircleShape
-                )
-                .background(
-                    if (selecionada) VerdeCriarComunidade else Color.Transparent,
-                    CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            if (selecionada) {
-                Text(
-                    text = "✓",
-                    color = Color.White,
-                    fontSize = 10.sp
-                )
-            }
-        }
-    }
-}
-
