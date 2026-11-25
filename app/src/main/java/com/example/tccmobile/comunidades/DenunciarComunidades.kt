@@ -1,5 +1,4 @@
-
-package com.example.tccmobile
+package com.example.tccmobile.comunidades
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

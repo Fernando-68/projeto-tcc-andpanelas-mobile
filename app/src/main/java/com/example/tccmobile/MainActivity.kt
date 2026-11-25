@@ -64,6 +64,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.tccmobile.cadastro.CadastroScreen
+import com.example.tccmobile.comunidades.ComunidadesScreen
+import com.example.tccmobile.comunidades.CriarComunidadeScreen
+import com.example.tccmobile.comunidades.DenunciarComunidadeScreen
+import com.example.tccmobile.comunidades.DetalheComunidadeScreen
 import com.example.tccmobile.data.EmailDataStore
 import com.example.tccmobile.home.HomeScreen
 import com.example.tccmobile.navigation.Routes
@@ -333,7 +337,7 @@ class MainActivity : ComponentActivity() {
                             onVoltar = {
                                 navController.popBackStack()
                             },
-                            onCriarComunidade = { nome, descricao, categoria, publica ->
+                            onCriarComunidade = { nome, descricao, categoria ->
 
                                 // Criação simulada.
                                 // Posteriormente, enviaremos os dados ao ViewModel e à API.

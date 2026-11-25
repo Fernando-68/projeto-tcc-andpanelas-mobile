@@ -1,6 +1,7 @@
+package com.example.tccmobile.comunidades
 
-package com.example.tccmobile
-
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,10 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tccmobile.R
 import com.example.tccmobile.home.NavegacaoInferiorHome
 
 private val FundoComunidade = Color(0xFFFFFCF8)
@@ -55,8 +60,7 @@ private data class ReceitaComunidade(
     val curtidas: Int,
     val comentarios: Int,
     val nivel: String,
-    val emoji: String,
-    val cor: Color
+    val imagem: Int
 )
 
 @Composable
@@ -102,16 +106,28 @@ fun DetalheComunidadeScreen(
     val receitas = remember {
         listOf(
             ReceitaComunidade(
-                "Pão de Queijo Mineiro (Vegano)",
-                "Mariana Lima", "ML", "30 min",
-                "15 porções", "Econômico", 482, 19,
-                "Fácil", "🥖", Color(0xFFE9C18C)
+                nome = "Pão de Queijo Mineiro (Vegano)",
+                autor = "Mariana Lima",
+                iniciaisAutor = "ML",
+                tempo = "30 min",
+                porcoes = "15 porções",
+                categoria = "Econômico",
+                curtidas = 482,
+                comentarios = 19,
+                nivel = "Fácil",
+                imagem = R.drawable.pao_de_queijo_vegano
             ),
             ReceitaComunidade(
-                "Risoto de Cogumelos Porcini",
-                "Mariana Lima", "ML", "45 min",
-                "2 porções", "Premium", 312, 14,
-                "Médio", "🍚", Color(0xFFD9D5C2)
+                nome = "Risoto de Cogumelos Porcini",
+                autor = "Mariana Lima",
+                iniciaisAutor = "ML",
+                tempo = "45 min",
+                porcoes = "2 porções",
+                categoria = "Premium",
+                curtidas = 312,
+                comentarios = 14,
+                nivel = "Médio",
+                imagem = R.drawable.risoto_cogumelos_porcini
             )
         )
     }
@@ -128,35 +144,29 @@ fun DetalheComunidadeScreen(
             contentPadding = PaddingValues(bottom = 18.dp)
         ) {
             item {
+                // BANNER DA COMUNIDADE
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(235.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color(0xFF596B3E),
-                                    Color(0xFF34452D),
-                                    Color(0xFF202B1D)
-                                )
-                            )
-                        )
                 ) {
-                    Text(
-                        text = "🥬  🥑  🥦  🍋  🥒  🥑",
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(top = 35.dp),
-                        fontSize = 35.sp
+                    Image(
+                        painter = painterResource(
+                            R.drawable.banner_veganos_criativos
+                        ),
+                        contentDescription = "Banner da comunidade $nomeComunidade",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
 
+                    // DEGRADÊ PARA MANTER OS TEXTOS LEGÍVEIS
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(
                                 Brush.verticalGradient(
                                     colors = listOf(
-                                        Color.Black.copy(alpha = 0.12f),
+                                        Color.Black.copy(alpha = 0.30f),
                                         Color.Transparent,
                                         Color.Black.copy(alpha = 0.65f)
                                     )
@@ -164,22 +174,35 @@ fun DetalheComunidadeScreen(
                             )
                     )
 
+                    // BOTÃO VOLTAR
                     Box(
                         modifier = Modifier
-                            .padding(start = 16.dp, top = 18.dp)
+                            .align(Alignment.TopStart)
+                            .padding(
+                                start = 16.dp,
+                                top = 18.dp
+                            )
                             .size(38.dp)
                             .clip(CircleShape)
                             .background(Color(0xFFF8F5EF))
                             .clickable { onVoltar() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("‹", color = MarromComunidade, fontSize = 32.sp)
+                        Text(
+                            text = "‹",
+                            color = MarromComunidade,
+                            fontSize = 32.sp
+                        )
                     }
 
+                    // MENU DE AÇÕES / DENÚNCIA
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(top = 18.dp, end = 16.dp)
+                            .padding(
+                                top = 18.dp,
+                                end = 16.dp
+                            )
                     ) {
                         Box {
                             Text(
@@ -188,16 +211,22 @@ fun DetalheComunidadeScreen(
                                 fontSize = 28.sp,
                                 modifier = Modifier
                                     .clip(CircleShape)
-                                    .clickable { menuAberto = true }
+                                    .clickable {
+                                        menuAberto = true
+                                    }
                                     .padding(horizontal = 10.dp)
                             )
 
                             DropdownMenu(
                                 expanded = menuAberto,
-                                onDismissRequest = { menuAberto = false }
+                                onDismissRequest = {
+                                    menuAberto = false
+                                }
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("Denunciar comunidade") },
+                                    text = {
+                                        Text("Denunciar comunidade")
+                                    },
                                     onClick = {
                                         menuAberto = false
                                         onDenunciar()
@@ -207,10 +236,15 @@ fun DetalheComunidadeScreen(
                         }
                     }
 
+                    // NOME E INFORMAÇÕES DA COMUNIDADE
                     Column(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
-                            .padding(start = 22.dp, end = 18.dp, bottom = 18.dp)
+                            .padding(
+                                start = 22.dp,
+                                end = 18.dp,
+                                bottom = 18.dp
+                            )
                     ) {
                         Text(
                             text = nomeComunidade,
@@ -219,7 +253,9 @@ fun DetalheComunidadeScreen(
                             fontWeight = FontWeight.Bold
                         )
 
-                        Spacer(modifier = Modifier.height(5.dp))
+                        Spacer(
+                            modifier = Modifier.height(5.dp)
+                        )
 
                         Text(
                             text = "♟ 12.4k membros   •   ▫ 3.2k receitas",
@@ -231,11 +267,15 @@ fun DetalheComunidadeScreen(
             }
 
             item {
+                // DESCRIÇÃO E AÇÕES DA COMUNIDADE
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.White)
-                        .padding(horizontal = 18.dp, vertical = 16.dp)
+                        .padding(
+                            horizontal = 18.dp,
+                            vertical = 16.dp
+                        )
                 ) {
                     Text(
                         text = "Receitas plant-based deliciosas para mostrar que vegano não come só salada! 🌱",
@@ -244,7 +284,9 @@ fun DetalheComunidadeScreen(
                         lineHeight = 21.sp
                     )
 
-                    Spacer(modifier = Modifier.height(15.dp))
+                    Spacer(
+                        modifier = Modifier.height(15.dp)
+                    )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -256,17 +298,21 @@ fun DetalheComunidadeScreen(
                             "ML" to Color(0xFFF8D9D8),
                             "CF" to Color(0xFFE5E5E5)
                         ).forEach { (iniciais, cor) ->
+
                             Box(
                                 modifier = Modifier
-                                    .padding(end = 0.dp)
                                     .size(25.dp)
                                     .clip(CircleShape)
                                     .background(cor)
-                                    .border(1.dp, Color.White, CircleShape),
+                                    .border(
+                                        1.dp,
+                                        Color.White,
+                                        CircleShape
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    iniciais,
+                                    text = iniciais,
                                     color = MarromComunidade,
                                     fontSize = 8.sp,
                                     fontWeight = FontWeight.Bold
@@ -274,7 +320,9 @@ fun DetalheComunidadeScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.weight(1f))
+                        Spacer(
+                            modifier = Modifier.weight(1f)
+                        )
 
                         Text(
                             text = "+12.4k outros membros",
@@ -283,14 +331,19 @@ fun DetalheComunidadeScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(
+                        modifier = Modifier.height(16.dp)
+                    )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // BOTÃO PARTICIPAR
                         Button(
-                            onClick = { participando = !participando },
+                            onClick = {
+                                participando = !participando
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .height(44.dp),
@@ -310,34 +363,53 @@ fun DetalheComunidadeScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(
+                            modifier = Modifier.width(10.dp)
+                        )
 
+                        // BOTÃO COMPARTILHAR
                         OutlinedButton(
                             onClick = onCompartilhar,
                             modifier = Modifier.size(44.dp),
                             shape = RoundedCornerShape(9.dp),
                             contentPadding = PaddingValues(0.dp),
-                            border = androidx.compose.foundation.BorderStroke(
-                                1.dp, BordaComunidade
+                            border = BorderStroke(
+                                1.dp,
+                                BordaComunidade
                             )
                         ) {
-                            Text("⇧", color = TextoSecundarioComunidade, fontSize = 23.sp)
+                            Image(
+                                painter = painterResource(
+                                    R.drawable.botao_compartilhar
+                                ),
+                                contentDescription = "Compartilhar comunidade",
+                                modifier = Modifier.size(30.dp),
+                                contentScale = ContentScale.Fit
+                            )
                         }
                     }
                 }
 
-                HorizontalDivider(color = BordaComunidade, thickness = 1.dp)
+                HorizontalDivider(
+                    color = BordaComunidade,
+                    thickness = 1.dp
+                )
             }
 
             item {
+                // ABAS RECEITAS E MEMBROS
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.White)
-                        .padding(horizontal = 18.dp, vertical = 12.dp),
+                        .padding(
+                            horizontal = 18.dp,
+                            vertical = 12.dp
+                        ),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     listOf("Receitas", "Membros").forEach { aba ->
+
                         val selecionada = abaSelecionada == aba
 
                         Box(
@@ -346,22 +418,33 @@ fun DetalheComunidadeScreen(
                                 .height(42.dp)
                                 .clip(RoundedCornerShape(9.dp))
                                 .background(
-                                    if (selecionada) MarromComunidade
-                                    else Color.White
+                                    if (selecionada) {
+                                        MarromComunidade
+                                    } else {
+                                        Color.White
+                                    }
                                 )
                                 .border(
                                     1.dp,
-                                    if (selecionada) MarromComunidade
-                                    else BordaComunidade,
+                                    if (selecionada) {
+                                        MarromComunidade
+                                    } else {
+                                        BordaComunidade
+                                    },
                                     RoundedCornerShape(9.dp)
                                 )
-                                .clickable { abaSelecionada = aba },
+                                .clickable {
+                                    abaSelecionada = aba
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = aba,
-                                color = if (selecionada) Color.White
-                                else TextoSecundarioComunidade,
+                                color = if (selecionada) {
+                                    Color.White
+                                } else {
+                                    TextoSecundarioComunidade
+                                },
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -369,10 +452,13 @@ fun DetalheComunidadeScreen(
                     }
                 }
 
-                HorizontalDivider(color = BordaComunidade)
+                HorizontalDivider(
+                    color = BordaComunidade
+                )
             }
 
             if (abaSelecionada == "Receitas") {
+
                 items(receitas) { receita ->
                     ReceitaComunidadeCard(receita)
                 }
@@ -382,20 +468,25 @@ fun DetalheComunidadeScreen(
                         text = "Editar comunidade",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onEditarComunidade() }
+                            .clickable {
+                                onEditarComunidade()
+                            }
                             .padding(vertical = 22.dp),
                         color = Color(0xFFFF9800),
                         fontSize = 14.sp,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 }
+
             } else {
+
                 items(membros) { membro ->
                     MembroComunidadeItem(membro)
                 }
             }
         }
 
+        // NAVEGAÇÃO INFERIOR FIXA
         NavegacaoInferiorHome(
             telaSelecionada = "Comunidades",
             onInicioClick = onAbrirInicio,
@@ -407,43 +498,75 @@ fun DetalheComunidadeScreen(
 }
 
 @Composable
-private fun ReceitaComunidadeCard(receita: ReceitaComunidade) {
+private fun ReceitaComunidadeCard(
+    receita: ReceitaComunidade
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 18.dp, vertical = 9.dp),
+            .padding(
+                horizontal = 18.dp,
+                vertical = 9.dp
+            ),
         shape = RoundedCornerShape(17.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        )
     ) {
         Column {
+
+            // FOTO DA RECEITA
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(175.dp)
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(receita.cor, receita.cor.copy(alpha = 0.65f))
-                        )
-                    )
             ) {
-                Text(
-                    text = receita.emoji,
-                    modifier = Modifier.align(Alignment.Center),
-                    fontSize = 76.sp
+                Image(
+                    painter = painterResource(
+                        id = receita.imagem
+                    ),
+                    contentDescription = receita.nome,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
 
+                // DEGRADÊ PARA DESTACAR O AUTOR
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.45f)
+                                )
+                            )
+                        )
+                )
+
+                // NÍVEL DA RECEITA
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(12.dp)
                         .clip(CircleShape)
                         .background(VerdeComunidade)
-                        .padding(horizontal = 15.dp, vertical = 6.dp)
+                        .padding(
+                            horizontal = 15.dp,
+                            vertical = 6.dp
+                        )
                 ) {
-                    Text(receita.nivel, color = Color.White, fontSize = 11.sp)
+                    Text(
+                        text = receita.nivel,
+                        color = Color.White,
+                        fontSize = 11.sp
+                    )
                 }
 
+                // AUTOR DA RECEITA
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -458,24 +581,28 @@ private fun ReceitaComunidadeCard(receita: ReceitaComunidade) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            receita.iniciaisAutor,
+                            text = receita.iniciaisAutor,
                             color = Color.White,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(7.dp))
+                    Spacer(
+                        modifier = Modifier.width(7.dp)
+                    )
 
                     Text(
-                        receita.autor,
+                        text = receita.autor,
                         color = Color.White,
                         fontSize = 12.sp
                     )
                 }
             }
 
-            Column(modifier = Modifier.padding(15.dp)) {
+            Column(
+                modifier = Modifier.padding(15.dp)
+            ) {
                 Text(
                     text = receita.nome,
                     color = MarromComunidade,
@@ -485,7 +612,9 @@ private fun ReceitaComunidadeCard(receita: ReceitaComunidade) {
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
 
                 Text(
                     text = "◷ ${receita.tempo}     ♙ ${receita.porcoes}     $ ${receita.categoria}",
@@ -493,16 +622,80 @@ private fun ReceitaComunidadeCard(receita: ReceitaComunidade) {
                     fontSize = 12.sp
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
-                HorizontalDivider(color = Color(0xFFF2EEE9))
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("♡ ${receita.curtidas}", color = Color(0xFFE91E4D), fontSize = 13.sp)
-                    Spacer(modifier = Modifier.width(18.dp))
-                    Text("◯ ${receita.comentarios}", color = TextoSecundarioComunidade, fontSize = 13.sp)
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text("♧", color = TextoSecundarioComunidade, fontSize = 21.sp)
+                HorizontalDivider(
+                    color = Color(0xFFF2EEE9)
+                )
+
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
+
+                // CURTIDAS, COMENTÁRIOS E SALVAR
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // CURTIDAS
+                    Image(
+                        painter = painterResource(
+                            R.drawable.heart
+                        ),
+                        contentDescription = "Curtidas",
+                        modifier = Modifier.size(19.dp),
+                        contentScale = ContentScale.Fit
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(5.dp)
+                    )
+
+                    Text(
+                        text = receita.curtidas.toString(),
+                        color = Color(0xFFE91E4D),
+                        fontSize = 13.sp
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(18.dp)
+                    )
+
+                    // COMENTÁRIOS
+                    Image(
+                        painter = painterResource(
+                            R.drawable.balao_comentario
+                        ),
+                        contentDescription = "Comentários",
+                        modifier = Modifier.size(19.dp),
+                        contentScale = ContentScale.Fit
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(5.dp)
+                    )
+
+                    Text(
+                        text = receita.comentarios.toString(),
+                        color = TextoSecundarioComunidade,
+                        fontSize = 13.sp
+                    )
+
+                    Spacer(
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    // SALVAR RECEITA
+                    Image(
+                        painter = painterResource(
+                            R.drawable.icone_salvar
+                        ),
+                        contentDescription = "Salvar receita",
+                        modifier = Modifier.size(21.dp),
+                        contentScale = ContentScale.Fit
+                    )
                 }
             }
         }
@@ -510,19 +703,32 @@ private fun ReceitaComunidadeCard(receita: ReceitaComunidade) {
 }
 
 @Composable
-private fun MembroComunidadeItem(membro: MembroComunidade) {
+private fun MembroComunidadeItem(
+    membro: MembroComunidade
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 18.dp, vertical = 5.dp),
+            .padding(
+                horizontal = 18.dp,
+                vertical = 5.dp
+            ),
         shape = RoundedCornerShape(13.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = androidx.compose.foundation.BorderStroke(1.dp, BordaComunidade)
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        border = BorderStroke(
+            1.dp,
+            BordaComunidade
+        )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 11.dp),
+                .padding(
+                    horizontal = 12.dp,
+                    vertical = 11.dp
+                ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -533,24 +739,30 @@ private fun MembroComunidadeItem(membro: MembroComunidade) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    membro.iniciais,
+                    text = membro.iniciais,
                     color = MarromComunidade,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(
+                modifier = Modifier.width(12.dp)
+            )
 
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
-                    membro.nome,
+                    text = membro.nome,
                     color = MarromComunidade,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
 
-                Spacer(modifier = Modifier.height(3.dp))
+                Spacer(
+                    modifier = Modifier.height(3.dp)
+                )
 
                 Text(
                     text = "${membro.funcao} · ${membro.receitas} receitas",
@@ -564,10 +776,13 @@ private fun MembroComunidadeItem(membro: MembroComunidade) {
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(Color(0xFFE58A00))
-                        .padding(horizontal = 9.dp, vertical = 4.dp)
+                        .padding(
+                            horizontal = 9.dp,
+                            vertical = 4.dp
+                        )
                 ) {
                     Text(
-                        "MOD",
+                        text = "MOD",
                         color = Color.White,
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold

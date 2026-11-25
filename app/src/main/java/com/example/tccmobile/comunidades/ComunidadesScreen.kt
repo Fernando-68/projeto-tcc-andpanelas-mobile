@@ -1,5 +1,4 @@
-
-package com.example.tccmobile
+package com.example.tccmobile.comunidades
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -31,10 +29,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tccmobile.home.NavegacaoInferiorHome
+import androidx.compose.foundation.Image
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.example.tccmobile.R
 
 private val FundoComunidades = Color(0xFFFFFCF8)
 private val MarromComunidades = Color(0xFF38251A)
@@ -125,7 +129,7 @@ fun ComunidadesScreen(
                     onValueChange = { textoPesquisa = it },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    textStyle = androidx.compose.ui.text.TextStyle(
+                    textStyle = TextStyle(
                         color = MarromComunidades,
                         fontSize = 13.sp
                     ),
@@ -151,25 +155,34 @@ fun ComunidadesScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(145.dp)
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                Color(0xFF493021),
-                                Color(0xFF98633C),
-                                Color(0xFF33231A)
-                            )
-                        ),
-                        RoundedCornerShape(14.dp)
-                    )
+                    .clip(RoundedCornerShape(14.dp))
                     .clickable { onAbrirComunidade() }
-                    .padding(14.dp)
             ) {
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.card_em_alta
+                    ),
+                    contentDescription = "Destaque da semana",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                // Camada escura para melhorar a leitura dos textos
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.42f))
+                )
+
                 Column(
-                    modifier = Modifier.align(Alignment.BottomStart)
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(14.dp)
                 ) {
                     Text(
                         text = "🔥 Em alta",
@@ -195,6 +208,7 @@ fun ComunidadesScreen(
                 }
             }
 
+
             Spacer(modifier = Modifier.height(20.dp))
 
             // MINHAS COMUNIDADES
@@ -207,19 +221,19 @@ fun ComunidadesScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 ComunidadeMiniatura(
-                    emoji = "🧁",
+                    imagem = R.drawable.bolos_e_conf,
                     nome = "Bolos & Confeitaria",
                     onClick = onAbrirComunidade
                 )
 
                 ComunidadeMiniatura(
-                    emoji = "🍲",
+                    imagem = R.drawable.cozinha_bras,
                     nome = "Cozinha Brasileira",
                     onClick = onAbrirComunidade
                 )
 
                 ComunidadeMiniatura(
-                    emoji = "🥗",
+                    imagem = R.drawable.veganos_criat,
                     nome = "Veganos Criativos",
                     onClick = onAbrirComunidade
                 )
@@ -234,6 +248,7 @@ fun ComunidadesScreen(
 
             ComunidadeListaItem(
                 emoji = "🌱",
+                imagem = R.drawable.icon_veganos,
                 nome = "Veganos Criativos",
                 informacoes = "12,4k membros • 3,2k receitas",
                 participando = false,
@@ -242,6 +257,7 @@ fun ComunidadesScreen(
 
             ComunidadeListaItem(
                 emoji = "🧁",
+                imagem = R.drawable.icon_bolinho_confeitaria,
                 nome = "Bolos & Confeitaria",
                 informacoes = "28,7k membros • 1,8k receitas",
                 participando = true,
@@ -250,6 +266,7 @@ fun ComunidadesScreen(
 
             ComunidadeListaItem(
                 emoji = "🍲",
+                imagem = R.drawable.icon_cozinha_brasileira,
                 nome = "Cozinha Brasileira",
                 informacoes = "45,6k membros • 8,9k receitas",
                 participando = true,
@@ -296,9 +313,10 @@ private fun TituloSecaoComunidades(texto: String) {
     )
 }
 
+
 @Composable
 private fun ComunidadeMiniatura(
-    emoji: String,
+    imagem: Int,
     nome: String,
     onClick: () -> Unit
 ) {
@@ -315,17 +333,14 @@ private fun ComunidadeMiniatura(
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
+        Image(
+            painter = painterResource(id = imagem),
+            contentDescription = nome,
             modifier = Modifier
                 .size(48.dp)
-                .background(
-                    Color(0xFFF4EBDD),
-                    RoundedCornerShape(9.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = emoji, fontSize = 25.sp)
-        }
+                .clip(RoundedCornerShape(9.dp)),
+            contentScale = ContentScale.Crop
+        )
 
         Spacer(modifier = Modifier.height(6.dp))
 
@@ -339,13 +354,16 @@ private fun ComunidadeMiniatura(
     }
 }
 
+
+
 @Composable
 private fun ComunidadeListaItem(
     emoji: String,
     nome: String,
     informacoes: String,
     participando: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    imagem: Int? = null
 ) {
     Row(
         modifier = Modifier
@@ -364,13 +382,23 @@ private fun ComunidadeListaItem(
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .background(
-                    Color(0xFFE3F5EC),
-                    RoundedCornerShape(10.dp)
-                ),
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color(0xFFE3F5EC)),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = emoji, fontSize = 21.sp)
+            if (imagem != null) {
+                Image(
+                    painter = painterResource(id = imagem),
+                    contentDescription = nome,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Text(
+                    text = emoji,
+                    fontSize = 21.sp
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(10.dp))
