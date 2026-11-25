@@ -70,11 +70,15 @@ import com.example.tccmobile.navigation.Routes
 import com.example.tccmobile.perfil.EditarInformacoesScreen
 import com.example.tccmobile.perfil.EditarPerfilScreen
 import com.example.tccmobile.perfil.PerfilScreen
+import com.example.tccmobile.receita.NovaReceitaScreen
+
 import com.example.tccmobile.ui.theme.PlayfairDisplay
 import com.example.tccmobile.ui.theme.TCCMobileTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,6 +126,18 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+
+                    composable(Routes.NOVA_RECEITA) {
+                        NovaReceitaScreen(
+                            onVoltar = {
+                                navController.popBackStack()
+                            },
+                            onProximo = {
+                                // Próxima etapa: ingredientes.
+                            }
+                        )
+                    }
+
 
                     composable(
                         route = Routes.CADASTRO
@@ -265,6 +281,9 @@ class MainActivity : ComponentActivity() {
                             onAbrirDetalheReceita = { receitaId ->
                                 navController.navigate(Routes.detalheReceita(receitaId))
                             },
+                            onAbrirNovaReceita = {
+                                navController.navigate(Routes.NOVA_RECEITA)
+                            },
                             onAbrirBusca = {
                                 navegarParaSecao(Routes.BUSCA)
                             },
@@ -284,10 +303,11 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(Routes.BUSCA) {
-
                         BuscaScreen(
                             onAbrirDetalheReceita = { receitaId ->
-                                navController.navigate(Routes.detalheReceita(receitaId))
+                                navController.navigate(
+                                    Routes.detalheReceita(receitaId)
+                                )
                             },
                             onAbrirInicio = {
                                 navegarParaSecao(Routes.HOME)
@@ -310,10 +330,9 @@ class MainActivity : ComponentActivity() {
                             onAbrirBusca = {
                                 navegarParaSecao(Routes.BUSCA)
                             },
-                            onAbrirGeladeira = {
-                                navegarParaSecao(Routes.GELADEIRA)
-                            }
-                        )
+                        ) {
+                            navegarParaSecao(Routes.GELADEIRA)
+                        }
                     }
 
                     composable(Routes.GELADEIRA) {
@@ -325,10 +344,9 @@ class MainActivity : ComponentActivity() {
                             onAbrirBusca = {
                                 navegarParaSecao(Routes.BUSCA)
                             },
-                            onAbrirComunidades = {
-                                navegarParaSecao(Routes.COMUNIDADES)
-                            }
-                        )
+                        ) {
+                            navegarParaSecao(Routes.COMUNIDADES)
+                        }
                     }
 
                     composable(
@@ -356,10 +374,9 @@ class MainActivity : ComponentActivity() {
                             onComunidadesClick = {
                                 navegarParaSecao(Routes.COMUNIDADES)
                             },
-                            onGeladeiraClick = {
-                                navegarParaSecao(Routes.GELADEIRA)
-                            }
-                        )
+                        ) {
+                            navegarParaSecao(Routes.GELADEIRA)
+                        }
                     }
 
                     composable(Routes.PERFIL) {

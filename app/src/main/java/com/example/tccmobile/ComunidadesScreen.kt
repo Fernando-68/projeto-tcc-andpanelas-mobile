@@ -2,8 +2,6 @@
 package com.example.tccmobile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,19 +11,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tccmobile.home.NavegacaoInferiorHome
+import com.example.tccmobile.ui.theme.components.AppBottomBar
+import com.example.tccmobile.ui.theme.components.BottomBarItem
 
 @Composable
 fun ComunidadesScreen(
     onAbrirInicio: () -> Unit,
     onAbrirBusca: () -> Unit,
-    onAbrirGeladeira: () -> Unit
+    onAbrirGeladeira: () -> Unit,
+    onAbrirComunidades: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -54,12 +53,18 @@ fun ComunidadesScreen(
             )
         }
 
-        NavegacaoInferiorHome(
-            telaSelecionada = "Comunidades",
-            onInicioClick = onAbrirInicio,
-            onBuscarClick = onAbrirBusca,
-            onComunidadesClick = {},
-            onGeladeiraClick = onAbrirGeladeira
+        AppBottomBar(
+            selected = BottomBarItem.Buscar,
+            onItemClick = { item ->
+                when (item) {
+                    BottomBarItem.Inicio -> onAbrirInicio()
+                    BottomBarItem.Buscar -> {}
+                    BottomBarItem.Comunidades -> onAbrirComunidades()
+                    BottomBarItem.Geladeira -> onAbrirGeladeira()
+                    BottomBarItem.ChefinhoIA -> {}
+                }
+            },
+            onAddClick = {}
         )
     }
 }

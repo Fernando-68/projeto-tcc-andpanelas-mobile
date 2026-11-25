@@ -58,6 +58,7 @@ private val BordaHome = Color(0xFFEDE2D0)
 @Composable
 fun HomeScreen(
     onAbrirDetalheReceita: (Long) -> Unit,
+    onAbrirNovaReceita: () -> Unit,
     onAbrirBusca: () -> Unit,
     onAbrirComunidades: () -> Unit,
     onAbrirGeladeira: () -> Unit,
@@ -152,12 +153,14 @@ fun HomeScreen(
 
         // NAVEGAÇÃO INFERIOR FIXA
 
+
         NavegacaoInferiorHome(
             telaSelecionada = "Início",
             onInicioClick = {},
             onBuscarClick = onAbrirBusca,
             onComunidadesClick = onAbrirComunidades,
-            onGeladeiraClick = onAbrirGeladeira
+            onGeladeiraClick = onAbrirGeladeira,
+            onAdicionarClick = onAbrirNovaReceita
         )
     }
 }
@@ -1238,7 +1241,8 @@ fun NavegacaoInferiorHome(
     onInicioClick: () -> Unit,
     onBuscarClick: () -> Unit,
     onComunidadesClick: () -> Unit,
-    onGeladeiraClick: () -> Unit
+    onGeladeiraClick: () -> Unit,
+    onAdicionarClick: () -> Unit
 ) {
 
     Column(
@@ -1339,7 +1343,7 @@ fun NavegacaoInferiorHome(
                         CircleShape
                     )
                     .clickable {
-                        // Ação de adicionar será implementada depois.
+                        onAdicionarClick()
                     },
                 contentAlignment = Alignment.Center
             ) {

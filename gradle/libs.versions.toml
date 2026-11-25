@@ -9,6 +9,8 @@ activityCompose = "1.8.0"
 kotlin = "2.0.21"
 composeBom = "2024.09.00"
 datastore = "1.1.7"
+ui = "1.13.0"
+uiToolingData = "1.13.0"
 
 
 [libraries]
@@ -29,6 +31,8 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore"}
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+androidx-compose-ui-tooling-data = { group = "androidx.compose.ui", name = "ui-tooling-data", version.ref = "uiToolingData" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

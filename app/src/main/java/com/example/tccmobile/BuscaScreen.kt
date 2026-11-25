@@ -26,6 +26,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material3.Surface
 import com.example.tccmobile.home.NavegacaoInferiorHome
+import com.example.tccmobile.ui.theme.components.AppBottomBar
+import com.example.tccmobile.ui.theme.components.BottomBarItem
 
 private val FundoBusca = Color(0xFFFFFCF8)
 private val MarromBusca = Color(0xFF38251A)
@@ -485,12 +487,18 @@ fun BuscaScreen(
 
         // NAVEGAÇÃO INFERIOR FIXA
 
-        NavegacaoInferiorHome(
-            telaSelecionada = "Buscar",
-            onInicioClick = onAbrirInicio,
-            onBuscarClick = {},
-            onComunidadesClick = onAbrirComunidades,
-            onGeladeiraClick = onAbrirGeladeira
+        AppBottomBar(
+            selected = BottomBarItem.Buscar,
+            onItemClick = { item ->
+                when (item) {
+                    BottomBarItem.Inicio -> onAbrirInicio()
+                    BottomBarItem.Buscar -> {}
+                    BottomBarItem.Comunidades -> onAbrirComunidades()
+                    BottomBarItem.Geladeira -> onAbrirGeladeira()
+                    BottomBarItem.ChefinhoIA -> {}
+                }
+            },
+            onAddClick = {}
         )
     }
 }
@@ -1570,7 +1578,7 @@ private fun ChipMeuIngredienteBusca(
     ) {
 
         Text(
-            text = if (ingrediente.quantidade.toIntOrNull() ?: 1 > 1) {
+            text = if ((ingrediente.quantidade.toIntOrNull() ?: 1) > 1) {
                 "${ingrediente.quantidade}x ${ingrediente.nome}"
             } else {
                 ingrediente.nome

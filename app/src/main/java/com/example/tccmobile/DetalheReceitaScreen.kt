@@ -30,7 +30,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.tccmobile.home.NavegacaoInferiorHome
+import com.example.tccmobile.ui.theme.components.AppBottomBar
+import com.example.tccmobile.ui.theme.components.BottomBarItem
 
 private val FundoDetalhe = Color(0xFFFFFCF8)
 private val MarromDetalhe = Color(0xFF38251A)
@@ -45,7 +46,10 @@ fun DetalheReceitaScreen(
     onInicioClick: () -> Unit,
     onBuscarClick: () -> Unit,
     onComunidadesClick: () -> Unit,
-    onGeladeiraClick: () -> Unit
+    onGeladeiraClick: () -> Unit,
+    onAbrirInicio: () -> Unit,
+    onAbrirComunidades: () -> Unit,
+    onAbrirGeladeira: () -> Unit
 ) {
 
     var abaSelecionada by remember {
@@ -503,12 +507,18 @@ fun DetalheReceitaScreen(
 
         // NAVEGAÇÃO INFERIOR FIXA
 
-        NavegacaoInferiorHome(
-            telaSelecionada = "",
-            onInicioClick = onInicioClick,
-            onBuscarClick = onBuscarClick,
-            onComunidadesClick = onComunidadesClick,
-            onGeladeiraClick = onGeladeiraClick
+        AppBottomBar(
+            selected = BottomBarItem.Buscar,
+            onItemClick = { item ->
+                when (item) {
+                    BottomBarItem.Inicio -> onAbrirInicio()
+                    BottomBarItem.Buscar -> {}
+                    BottomBarItem.Comunidades -> onAbrirComunidades()
+                    BottomBarItem.Geladeira -> onAbrirGeladeira()
+                    BottomBarItem.ChefinhoIA -> {}
+                }
+            },
+            onAddClick = {}
         )
     }
 
@@ -530,6 +540,8 @@ fun DetalheReceitaScreen(
         )
     }
 }
+
+
 
 // INFORMAÇÕES DA RECEITA
 

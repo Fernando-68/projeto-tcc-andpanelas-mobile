@@ -2,7 +2,6 @@
 package com.example.tccmobile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,13 +16,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tccmobile.home.NavegacaoInferiorHome
+import com.example.tccmobile.ui.theme.components.AppBottomBar
+import com.example.tccmobile.ui.theme.components.BottomBarItem
 
 @Composable
 fun GeladeiraScreen(
     onAbrirInicio: () -> Unit,
     onAbrirBusca: () -> Unit,
-    onAbrirComunidades: () -> Unit
+    onAbrirComunidades: () -> Unit,
+    onAbrirGeladeira: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -52,12 +53,18 @@ fun GeladeiraScreen(
             )
         }
 
-        NavegacaoInferiorHome(
-            telaSelecionada = "Geladeira",
-            onInicioClick = onAbrirInicio,
-            onBuscarClick = onAbrirBusca,
-            onComunidadesClick = onAbrirComunidades,
-            onGeladeiraClick = {}
+        AppBottomBar(
+            selected = BottomBarItem.Buscar,
+            onItemClick = { item ->
+                when (item) {
+                    BottomBarItem.Inicio -> onAbrirInicio()
+                    BottomBarItem.Buscar -> {}
+                    BottomBarItem.Comunidades -> onAbrirComunidades()
+                    BottomBarItem.Geladeira -> onAbrirGeladeira()
+                    BottomBarItem.ChefinhoIA -> {}
+                }
+            },
+            onAddClick = {}
         )
     }
 }

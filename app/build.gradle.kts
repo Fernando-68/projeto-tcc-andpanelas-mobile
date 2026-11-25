@@ -77,6 +77,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.9.8")
     implementation("io.coil-kt.coil3:coil-compose:3.0.4")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.ui.tooling.data)
 
     // Testes
     testImplementation(libs.junit)

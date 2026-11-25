@@ -6,6 +6,7 @@ object Routes {
     const val VERIFICACAO_CODIGO = "verificacao-codigo/{email}"
     const val ESQUECEU_SENHA = "esqueceu-senha"
 
+    const val NOVA_RECEITA = "nova_receita"
     const val CODIGO_RECUPERACAO = "codigo-recuperacao/{email}"
 
     const val NOVA_SENHA = "nova-senha"
